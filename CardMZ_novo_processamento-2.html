@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080b0f">
+<title>CardMZ — Virtual CardMZ</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
+:root{
+--bg:#070a0e;--panel:#0e141a;--panel2:#121a21;--panel3:#172129;
+--line:#27323b;--text:#f5f8fa;--muted:#7e8a95;--green:#20d19b;
+--green2:#16a879;--green3:#9af0d1;--red:#ef6672;--blue:#5b9cff;
+--gold:#dcb55f;--purple:#aa91f5
+}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,select{font:inherit}button{color:inherit}
+.app{width:100%;max-width:520px;height:100dvh;margin:auto;background:
+radial-gradient(circle at 50% -20%,rgba(32,209,155,.055),transparent 34%),var(--bg);
+display:flex;flex-direction:column;position:relative;overflow:hidden}
+.pages{flex:1;min-height:0;position:relative;overflow:hidden}
+.page{display:none;width:100%;height:100%;overflow-y:auto;padding-bottom:34px}
+.page.active{display:block;animation:pageIn .28s ease}
+@keyframes pageIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+.top{padding:24px 18px 14px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:11px}.brand-icon{width:44px;height:44px;border-radius:14px;
+background:linear-gradient(145deg,#1d292f,#0c1318);border:1px solid #34434b;display:flex;align-items:center;
+justify-content:center}.brand-icon svg{width:24px;height:24px}.top-title{font-size:15px;font-weight:850}
+.top-sub{font-size:10px;color:var(--muted);margin-top:3px}.status{display:flex;align-items:center;gap:7px;
+padding:8px 11px;border:1px solid #273b35;border-radius:999px;background:#0b1613;color:#9de9d0;font-size:10px;font-weight:800}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px rgba(32,209,155,.7)}
+.balance-box{margin:6px 17px 17px;padding:21px;border:1px solid var(--line);border-radius:22px;
+background:radial-gradient(circle at 100% 0%,rgba(32,209,155,.08),transparent 34%),linear-gradient(145deg,#121a21,#0c1116);
+box-shadow:0 12px 35px rgba(0,0,0,.2)}.label{font-size:9px;color:var(--muted);letter-spacing:1.4px;
+text-transform:uppercase;font-weight:750}.balance{font-size:45px;line-height:1.05;font-weight:900;letter-spacing:-2.3px;margin:7px 0 4px}
+.mzn{font-size:12px;color:var(--green3)}.balance-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:19px}
+.mini{background:#0b1015;border:1px solid #222d35;border-radius:14px;padding:12px}.mini b{display:block;font-size:13px;margin-top:5px}.mini span{font-size:9px;color:var(--muted)}
+.card{border-radius:26px;padding:24px;position:relative;overflow:hidden;min-height:218px;background:
+radial-gradient(circle at 85% 8%,rgba(255,255,255,.13),transparent 24%),radial-gradient(circle at 10% 100%,rgba(32,209,155,.12),transparent 32%),
+linear-gradient(135deg,#253438 0%,#121b1e 42%,#080c10 100%);border:1px solid #405057;box-shadow:0 22px 48px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.08)}
+.card:before{content:"";position:absolute;width:280px;height:280px;right:-145px;bottom:-185px;border-radius:50%;
+border:1px solid rgba(255,255,255,.055);box-shadow:0 0 0 30px rgba(255,255,255,.012),0 0 0 60px rgba(255,255,255,.008)}
+.card-top{display:flex;justify-content:space-between;position:relative;z-index:2}.card-brand{font-size:10px;font-weight:850;letter-spacing:2.1px;color:#b7ddd2}
+.chip{width:46px;height:32px;border-radius:7px;background:linear-gradient(135deg,#a68c52,#e2cb91,#806b3d);border:1px solid rgba(255,255,255,.18)}
+.card-number{font-family:ui-monospace,monospace;font-size:20px;letter-spacing:3.5px;margin:39px 0 30px;position:relative;z-index:2}
+.card-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;position:relative;z-index:2}
+.card-caption{font-size:7px;color:#7e8c91;letter-spacing:1.2px;text-transform:uppercase}.card-value{font-size:11px;font-weight:800;margin-top:4px;max-width:185px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.card-network{font-size:12px;font-weight:850}
+.section{padding:0 17px;margin-top:19px}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.section-title{font-size:14px;font-weight:850}.link{border:0;background:none;color:#69dfbd;font-size:10px;font-weight:750}
+.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.action{min-height:78px;border:1px solid var(--line);
+background:linear-gradient(145deg,#111820,#0d1318);border-radius:17px;padding:13px;display:flex;align-items:center;gap:12px;cursor:pointer;text-align:left}
+.action-icon{width:43px;height:43px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.action-icon svg{width:22px;height:22px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.info-card{background:linear-gradient(145deg,#111820,#0d1318);
+border:1px solid var(--line);border-radius:17px;padding:15px;min-height:100px}.info-card b{display:block;font-size:12px}.info-card span{display:block;color:var(--muted);font-size:9px;margin-top:5px;line-height:1.5}
+.tx{background:linear-gradient(145deg,#111820,#0d1318);border:1px solid var(--line);border-radius:16px;padding:13px;display:flex;align-items:center;gap:11px}
+.tx-icon{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center}.tx-main{flex:1;min-width:0}
+.tx-name{font-size:12px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tx-date{font-size:9px;color:var(--muted);margin-top:4px}.tx-amount{font-size:12px;font-weight:850}
+.nav{height:72px;background:rgba(14,19,24,.98);border-top:1px solid var(--line);display:flex;flex-shrink:0}.nav button{flex:1;border:0;background:none;color:#6f7b85;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:9px;position:relative}.nav button.active{color:var(--green)}.nav svg{width:28px;height:28px;stroke-width:2.35}.nav button{font-weight:800}.nav button.active svg{filter:drop-shadow(0 0 7px rgba(32,209,155,.35))}
+.tab-processing{position:fixed;inset:0;z-index:700;display:none;align-items:center;justify-content:center;background:rgba(4,8,11,.72);backdrop-filter:blur(7px)}.tab-processing.show{display:flex}.tab-loader{width:104px;height:104px;border-radius:50%;border:3px solid #24342f;border-top-color:var(--green);border-right-color:#8cebd0;animation:rotate .72s linear infinite;box-shadow:0 0 35px rgba(32,209,155,.16)}.tab-processing-inner{text-align:center}.tab-processing-inner b{display:block;font-size:14px;margin-top:18px}.tab-processing-inner span{display:block;color:var(--muted);font-size:10px;margin-top:5px}
+.withdraw-value-box{margin:12px 0;padding:14px;border-radius:17px;border:1px solid rgba(32,209,155,.22);background:linear-gradient(145deg,#0f1d19,#0b1215)}.withdraw-value-usd{font-size:27px;font-weight:950;letter-spacing:-.8px}.withdraw-value-mzn{font-size:13px;color:#9af0d1;font-weight:850;margin-top:5px}.withdraw-value-box small{display:block;color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.notification-item{padding:15px 14px;border-radius:18px}.notification-main b{font-size:14px;font-weight:950;color:#fff}.notification-main span{font-size:10px}.notification-amount{font-size:15px;font-weight:950;color:#fff;white-space:nowrap}.notification-amount.usd{font-size:17px;letter-spacing:-.2px;color:#9af0d1}.toast{padding:20px}.toast-title{font-size:16px;font-weight:950}.toast-message{font-size:13px}.toast-sender{font-size:18px;font-weight:950;color:#fff}.toast-usd{font-size:21px;font-weight:950;color:#9af0d1;margin-top:3px}.toast-mzn{font-size:12px;color:#c7d1d5;font-weight:800;margin-top:2px}
+.badge{position:absolute;top:7px;right:25%;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--green);color:#06110d;font-size:8px;font-weight:900;display:none;align-items:center;justify-content:center}
+.page-head{padding:25px 18px 12px}.page-head h1{font-size:25px;margin:0;font-weight:900}.page-head p{font-size:10px;color:var(--muted);margin:6px 0;line-height:1.5}
+.card-slider{display:flex;gap:15px;overflow-x:auto;padding:11px 17px 20px}.card-item{min-width:90%;max-width:390px}
+.card-details,.account-card,.support-card{margin-top:10px;background:linear-gradient(145deg,#111820,#0d1318);border:1px solid var(--line);border-radius:16px;padding:14px}
+.card-details-row,.account-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #202a31}.card-details-row:last-child,.account-row:last-child{border:0}
+.card-details-row span,.account-row span{font-size:9px;color:var(--muted)}.card-details-row b,.account-row b{font-size:10px;text-align:right}
+.selected-card{margin:0 17px 11px;padding:12px 14px;border-radius:15px;border:1px solid rgba(32,209,155,.25);background:rgba(32,209,155,.055);display:flex;align-items:center;justify-content:space-between}
+.selected-card b{font-size:10px}.selected-card span{display:block;font-size:9px;color:var(--muted);margin-top:3px}
+.add-card-btn{width:calc(100% - 34px);margin:0 17px;height:58px;border-radius:16px;background:#10171d;border:1px dashed #39464e;display:flex;align-items:center;justify-content:center;gap:9px;font-size:11px;font-weight:800}
+.withdraw-wrap{padding:0 17px}.stepbar{display:flex;gap:5px;margin:8px 0 18px}.step{flex:1;height:5px;border-radius:8px;background:#252e35;transition:.35s}
+.step.active{background:linear-gradient(90deg,var(--green2),var(--green));box-shadow:0 0 10px rgba(32,209,155,.18)}
+.withdraw-panel{background:linear-gradient(145deg,#111820,#0c1217);border:1px solid var(--line);border-radius:22px;padding:19px;box-shadow:0 15px 40px rgba(0,0,0,.18)}
+.withdraw-step{display:none}.withdraw-step.active{display:block;animation:stepIn .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes stepIn{from{opacity:0;transform:translateX(28px) scale(.985)}to{opacity:1;transform:translateX(0) scale(1)}}
+.method{width:100%;border:1px solid var(--line);background:#0b1116;border-radius:17px;padding:15px;display:flex;align-items:center;gap:13px;margin-bottom:9px;text-align:left;cursor:pointer}
+.method.active{border-color:#3b8e76;background:#0f1b18}.method-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.method b{font-size:12px}.method span{display:block;color:var(--muted);font-size:9px;margin-top:4px;line-height:1.35}.check{margin-left:auto;width:22px;height:22px;border-radius:50%;border:1px solid #3a454d;display:flex;align-items:center;justify-content:center;color:#07120e;flex-shrink:0}.method.active .check{background:var(--green);border-color:var(--green)}
+.field-label{display:block;color:#8b969f;font-size:9px;text-transform:uppercase;letter-spacing:.9px;margin:15px 0 7px;font-weight:750}
+.field{width:100%;height:52px;border:1px solid #2a353e;border-radius:14px;background:#090f14;color:#fff;padding:0 14px;outline:none}
+.amount-input{height:61px;font-size:24px;font-weight:900}.summary{margin-top:13px;border:1px solid #29343c;background:#090f14;border-radius:16px;padding:14px}
+.summary-row{display:flex;justify-content:space-between;gap:12px;font-size:10px;margin:8px 0}.summary-row span{color:var(--muted)}.summary-row b{font-size:11px;text-align:right}
+.primary{width:100%;height:53px;border:0;border-radius:15px;background:linear-gradient(135deg,#28d9a2,#17b783);color:#03110c;font-size:11px;font-weight:900;cursor:pointer;margin-top:14px}
+.primary:disabled{opacity:.35;cursor:not-allowed}.secondary{width:100%;height:49px;border:1px solid var(--line);border-radius:15px;background:#10161c;color:#fff;font-size:10px;font-weight:800;cursor:pointer;margin-top:8px}
+.processing{text-align:center;padding:10px 4px 4px}.processing-icon{width:108px;height:108px;margin:8px auto 22px;border-radius:50%;border:1px solid #31443e;background:radial-gradient(circle,rgba(32,209,155,.09),transparent 65%),#0b1513;display:flex;align-items:center;justify-content:center;position:relative}
+.processing-icon:before{content:"";position:absolute;inset:5px;border-radius:50%;border:4px solid #263a34;border-top-color:var(--green);border-right-color:#8cebd0;animation:rotate 1s linear infinite}
+.processing-icon:after{content:"";position:absolute;inset:14px;border-radius:50%;border:1px dashed rgba(32,209,155,.25);animation:rotateReverse 2.5s linear infinite}
+@keyframes rotate{to{transform:rotate(360deg)}}@keyframes rotateReverse{to{transform:rotate(-360deg)}}
+.processing h2{font-size:21px;margin:0;font-weight:900}.processing p{font-size:11px;color:var(--muted);line-height:1.6;margin:7px 0}
+.processing-number{font-size:38px;font-weight:900;margin-top:17px}.processing-unit{font-size:8px;color:#69747d;letter-spacing:1.4px}
+.progress{height:8px;background:#202930;border-radius:10px;overflow:hidden;margin:20px 0 9px}.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--green2),var(--green3));transition:width .4s linear}
+.processing-log{text-align:left;background:#090f14;border:1px solid #252f36;border-radius:15px;padding:12px;margin-top:16px}
+.log{display:flex;gap:9px;align-items:center;font-size:10px;color:#68737d;padding:9px 0;transition:.25s}.log.ok{color:#a8decf}.log-dot{width:8px;height:8px;border-radius:50%;background:#3c474f;flex-shrink:0}.log.ok .log-dot{background:var(--green);box-shadow:0 0 9px rgba(32,209,155,.35)}
+.stage-card{margin-top:12px;border:1px solid #2a3835;border-radius:15px;padding:13px;background:#0b1513;text-align:left}.stage-card b{font-size:10px}.stage-card span{display:block;font-size:9px;color:var(--muted);margin-top:4px}
+.receipt{border:1px solid #30443c;background:radial-gradient(circle at 50% 0%,rgba(32,209,155,.06),transparent 32%),#0d1513;border-radius:19px;padding:18px}
+.receipt-success{width:82px;height:82px;margin:3px auto 15px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0d241c;border:1px solid #2d725b;box-shadow:0 0 30px rgba(32,209,155,.1)}
+.receipt-title{text-align:center;font-size:19px;font-weight:900}.receipt-sub{text-align:center;font-size:9px;color:var(--muted);margin-top:5px;line-height:1.5}.receipt-id{text-align:center;font-family:ui-monospace,monospace;font-size:9px;color:#8c979f;margin:11px 0 16px}
+.receipt-row{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid #27302f;padding:10px 0}.receipt-row span{font-size:9px;color:var(--muted)}.receipt-row b{font-size:10px;text-align:right;max-width:62%;word-break:break-word}
+.receipt-status{margin-top:15px;padding:12px;border-radius:12px;background:rgba(32,209,155,.06);border:1px solid rgba(32,209,155,.2);text-align:center;color:#8ddbc4;font-size:9px;font-weight:750;line-height:1.5}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);z-index:100;display:none;align-items:flex-end;justify-content:center}.overlay.show{display:flex}
+.sheet{width:100%;max-width:520px;max-height:93dvh;overflow-y:auto;background:#11171d;border:1px solid #2d3941;border-bottom:0;border-radius:25px 25px 0 0;padding:22px 18px 32px;animation:sheet .34s ease}
+@keyframes sheet{from{transform:translateY(100%)}to{transform:translateY(0)}}.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.sheet h2{font-size:18px;margin:0}.sheet p{font-size:10px;color:var(--muted);margin:5px 0}.close{width:36px;height:36px;border-radius:50%;background:#0c1115;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px}
+.option-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.option{border:1px solid var(--line);background:#0d1318;border-radius:14px;padding:13px;text-align:left}.option.active{border-color:#398b74;background:#101c19}.option b{font-size:11px}.option span{display:block;color:var(--muted);font-size:9px;margin-top:4px}
+.toast{position:fixed;z-index:500;left:9px;right:9px;top:10px;max-width:502px;margin:auto;background:radial-gradient(circle at 0 0,rgba(32,209,155,.11),transparent 32%),#121a20;border:1px solid #4b626a;border-radius:23px;padding:18px;transform:translateY(-180%);opacity:0;transition:.45s cubic-bezier(.2,.8,.2,1);box-shadow:0 22px 55px rgba(0,0,0,.55)}
+.toast.show{transform:translateY(0);opacity:1}.toast-content{display:flex;gap:14px;align-items:center}.toast-icon{width:54px;height:54px;border-radius:17px;background:#102820;border:1px solid #2b705b;display:flex;align-items:center;justify-content:center;flex-shrink:0}.toast-icon svg{width:28px;height:28px}
+.toast-main{flex:1;min-width:0}.toast-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.toast-title{font-size:14px;font-weight:950}.toast-time{font-size:9px;color:#75818a}.toast-message{font-size:12px;color:#c1cbd0;margin:5px 0 0;line-height:1.45}.toast-close{width:32px;height:32px;border-radius:10px;background:#0b1116;border:1px solid #263139;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px}
+.notification-item{background:linear-gradient(145deg,#111820,#0d1318);border:1px solid var(--line);border-radius:17px;padding:14px;display:flex;gap:11px;align-items:center}.notification-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.notification-main{flex:1;min-width:0}.notification-main b{font-size:11px;display:block}.notification-main span{display:block;color:var(--muted);font-size:9px;margin-top:4px}.notification-amount{font-size:11px;font-weight:900}.notification-remove{width:30px;height:30px;border-radius:9px;border:1px solid #303a42;background:#0b1015;cursor:pointer;color:#8c979f}
+.empty{padding:38px 15px;text-align:center;color:#727d86;font-size:10px;border:1px solid #252d34;border-radius:16px;background:#10151b}
+@media(max-width:360px){.balance{font-size:39px}.card-number{font-size:17px;letter-spacing:2.5px}.card{padding:20px}.actions{grid-template-columns:1fr}.info-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="pages">
+
+<section id="page-home" class="page active">
+<div class="top"><div class="brand"><div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></div><div><div class="top-title">CardMZ</div><div class="top-sub">Carteira digital</div></div></div><div class="status"><i class="status-dot"></i>Ativa</div></div>
+<div class="balance-box"><span class="label">Saldo disponível</span><div id="home-balance" class="balance">$0.00</div><div id="home-mzn" class="mzn">~ 0 MZN</div><div class="balance-meta"><div class="mini"><span>Saldo reservado</span><b>$0.00</b></div><div class="mini"><span>Limite disponível</span><b>$1,000.00</b></div></div></div>
+<div class="section"><div id="home-card"></div></div>
+<div class="section"><div class="section-head"><div class="section-title">Acesso rápido</div></div><div class="actions">
+<button class="action" onclick="openDeposit()"><div class="action-icon" style="background:#10251f"><svg viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div><span>Adicionar valor</span></button>
+<button class="action" onclick="goToPage('withdraw')"><div class="action-icon" style="background:#211d12"><svg viewBox="0 0 24 24" fill="none" stroke="#dcb55f" stroke-width="2"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div><span>Levantamento</span></button>
+<button class="action" onclick="goToPage('cards')"><div class="action-icon" style="background:#111d2d"><svg viewBox="0 0 24 24" fill="none" stroke="#5b9cff" stroke-width="1.8"><rect x="2.5" y="4" width="19" height="16" rx="3"/><path d="M2.5 9h19"/></svg></div><span>Meus cartões</span></button>
+<button class="action" onclick="goToPage('informacoes')"><div class="action-icon" style="background:#19162a"><svg viewBox="0 0 24 24" fill="none" stroke="#aa91f5" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/></svg></div><span>Notificações</span></button>
+</div></div>
+<div class="section"><div class="section-head"><div class="section-title">Resumo da conta</div><button class="link" onclick="goToPage('account')">Detalhes</button></div><div class="info-grid">
+<div class="info-card"><b>Moeda principal</b><span>USD · equivalente apresentado em MZN</span></div>
+<div class="info-card"><b>Movimentos</b><span id="movement-count">0 transações registadas</span></div>
+<div class="info-card"><b>Segurança</b><span>Proteção local disponível</span></div>
+<div class="info-card"><b>Status</b><span>Conta ativa</span></div>
+</div></div>
+<div class="section"><div class="section-head"><div class="section-title">Atividade recente</div><button class="link" onclick="goToPage('history')">Ver tudo</button></div><div id="home-history" style="display:flex;flex-direction:column;gap:8px"></div></div>
+</section>
+
+<section id="page-cards" class="page">
+<div class="page-head"><h1>Meus Cartões</h1><p>Selecione e gerencie os seus cartões.</p></div>
+<div id="selected-card-box"></div><div id="cards-list" class="card-slider"></div>
+<button class="add-card-btn" onclick="openCardModal()">＋ Adicionar novo cartão</button>
+<div class="section"><div class="section-title" style="margin-bottom:10px">Segurança do cartão</div><div class="account-card">
+<div class="account-row"><span>Bloqueio temporário</span><b style="color:#20d19b">Disponível</b></div>
+<div class="account-row"><span>Dados sensíveis</span><b>Protegidos</b></div><div class="account-row"><span>Limite diário</span><b>$1,000.00</b></div>
+<div class="account-row"><span>Compras online</span><b style="color:#20d19b">Ativas</b></div></div></div>
+</section>
+
+<section id="page-withdraw" class="page">
+<div class="page-head"><h1>Levantamento</h1><p>Preencha os dados e acompanhe cada etapa do processamento.</p></div>
+<div class="withdraw-wrap"><div class="stepbar">
+<div id="s1" class="step active"></div><div id="s2" class="step"></div><div id="s3" class="step"></div><div id="s4" class="step"></div><div id="s5" class="step"></div><div id="s6" class="step"></div><div id="s7" class="step"></div>
+</div><div class="withdraw-panel">
+
+<div id="w1" class="withdraw-step active"><div class="label">Etapa 1 de 7</div><h2 style="font-size:19px;margin:7px 0">Escolha o método</h2><p style="font-size:10px;color:var(--muted);line-height:1.6">Selecione o destino da operação.</p>
+<button class="method active" onclick="selectMethod('mpesa')" id="method-mpesa"><div class="method-icon" style="background:#102a21">M</div><div><b>M-Pesa</b><span>Destino por número de carteira</span></div><div class="check" id="check-mpesa">✓</div></button>
+<button class="method" onclick="selectMethod('emola')" id="method-emola"><div class="method-icon" style="background:#172a1d">E</div><div><b>e-Mola</b><span>Destino por número de carteira</span></div><div class="check" id="check-emola"></div></button>
+<button class="method" onclick="selectMethod('paypal')" id="method-paypal"><div class="method-icon" style="background:#101e34">P</div><div><b>PayPal</b><span>Conta ou endereço de e-mail</span></div><div class="check" id="check-paypal"></div></button>
+<button class="method" onclick="selectMethod('bim')" id="method-bim"><div class="method-icon" style="background:#292115">B</div><div><b>Millennium BIM</b><span>Destino bancário</span></div><div class="check" id="check-bim"></div></button>
+<button class="primary" onclick="withdrawNext(2)">Continuar</button></div>
+
+<div id="w2" class="withdraw-step"><div class="label">Etapa 2 de 7</div><h2 style="font-size:19px;margin:7px 0">Selecionar cartão</h2><p style="font-size:10px;color:var(--muted)">Escolha o cartão associado à operação.</p><div id="withdraw-card-selection" style="display:flex;flex-direction:column;gap:9px;margin-top:15px"></div><button class="primary" onclick="withdrawNext(3)">Continuar</button><button class="secondary" onclick="withdrawNext(1)">Voltar</button></div>
+
+<div id="w3" class="withdraw-step"><div class="label">Etapa 3 de 7</div><h2 style="font-size:19px;margin:7px 0">Defina o valor</h2>
+<div class="balance-box" style="margin:14px 0;padding:16px"><span class="label">Saldo disponível</span><b id="withdraw-balance" style="display:block;font-size:26px;margin-top:4px">$0.00</b></div>
+<label class="field-label">Moeda</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button id="cur-usd" class="method active" onclick="setCurrency('USD')" style="margin:0;justify-content:center"><b>USD</b></button><button id="cur-mzn" class="method" onclick="setCurrency('MZN')" style="margin:0;justify-content:center"><b>MZN</b></button></div>
+<label class="field-label">Valor do levantamento</label><input id="withdraw-amount" class="field amount-input" type="number" min="0" step=".01" placeholder="0.00" oninput="updateWithdrawPreview()"><div class="withdraw-value-box"><small>Valor da operação</small><div id="withdraw-usd-live" class="withdraw-value-usd">$0.00 USD</div><div id="withdraw-mzn-live" class="withdraw-value-mzn">0 MZN</div></div>
+<div class="summary"><div class="summary-row"><span>Valor solicitado</span><b id="sum-amount">$0.00</b></div><div class="summary-row"><span>Taxa</span><b>$0.00</b></div><div class="summary-row"><span>Equivalente</span><b id="sum-equivalent">0 MZN</b></div><div class="summary-row"><span>Saldo após operação</span><b id="sum-after">$0.00</b></div></div>
+<button class="primary" id="amount-next" disabled onclick="withdrawNext(4)">Continuar</button><button class="secondary" onclick="withdrawNext(2)">Voltar</button></div>
+
+<div id="w4" class="withdraw-step"><div class="label">Etapa 4 de 7</div><h2 style="font-size:19px;margin:7px 0">Dados do destino</h2>
+<label id="destination-label" class="field-label">Número M-Pesa</label><input id="destination" class="field" type="text" placeholder="Ex.: 84 000 0000">
+<label class="field-label">Nome do destinatário</label><input id="destination-name" class="field" placeholder="Nome para identificação">
+<label class="field-label">Observação</label><input id="destination-note" class="field" placeholder="Opcional">
+<div class="summary"><div class="summary-row"><span>Método</span><b id="review-method">M-Pesa</b></div><div class="summary-row"><span>Cartão</span><b id="review-card">Não selecionado</b></div><div class="summary-row"><span>Valor</span><b id="review-amount">$0.00</b></div><div class="summary-row"><span>Destino</span><b id="review-destination">Não informado</b></div></div>
+<button class="primary" onclick="validateDestination()">Continuar</button><button class="secondary" onclick="withdrawNext(3)">Voltar</button></div>
+
+<div id="w5" class="withdraw-step"><div class="label">Etapa 5 de 7</div><h2 style="font-size:19px;margin:7px 0">Revisar operação</h2>
+<div class="receipt" style="margin-top:14px"><div class="receipt-title">Revisão da operação</div><div class="receipt-sub">Confira os dados antes de iniciar o processamento.</div>
+<div class="receipt-row"><span>Método</span><b id="confirm-method">M-Pesa</b></div><div class="receipt-row"><span>Cartão</span><b id="confirm-card">—</b></div><div class="receipt-row"><span>Valor solicitado</span><b id="confirm-amount">$0.00</b></div><div class="receipt-row"><span>Destinatário</span><b id="confirm-name">—</b></div><div class="receipt-row"><span>Destino</span><b id="confirm-destination">—</b></div></div>
+<button class="primary" onclick="startWithdrawProcessing()">Iniciar processamento</button><button class="secondary" onclick="withdrawNext(4)">Voltar e editar</button></div>
+
+<div id="w6" class="withdraw-step"><div class="processing"><div class="processing-icon"><svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="1.5"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="8"/></svg></div>
+<h2 id="processing-title">A preparar</h2><p id="processing-text">A operação está a ser processada.</p><div id="processing-seconds" class="processing-number">35</div><div class="processing-unit">SEGUNDOS</div>
+<div class="progress"><div id="progress-bar" class="progress-bar"></div></div><div style="display:flex;justify-content:space-between;font-size:8px;color:#69747d"><span>Início</span><span id="progress-percent">0%</span><span>Final</span></div>
+<div id="stage-card" class="stage-card"><b id="stage-name">A iniciar...</b><span id="stage-detail">Aguarde enquanto a etapa é processada.</span></div>
+<div class="processing-log">
+<div id="log1" class="log"><i class="log-dot"></i>Validando dados</div><div id="log2" class="log"><i class="log-dot"></i>Conferindo cartão</div><div id="log3" class="log"><i class="log-dot"></i>Validando valor</div><div id="log4" class="log"><i class="log-dot"></i>Conferindo destino</div><div id="log5" class="log"><i class="log-dot"></i>Registando operação local</div><div id="log6" class="log"><i class="log-dot"></i>Finalizando processamento</div>
+</div></div></div>
+
+<div id="w7" class="withdraw-step"><div class="processing">
+<div class="receipt-success"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg></div>
+<h2>Confirmação concluída</h2><p>Os dados abaixo correspondem ao processamento local realizado nesta página.</p>
+<div class="receipt" style="text-align:left;margin-top:18px"><div class="receipt-title">Levantamento confirmado</div><div class="receipt-sub">Confirmação visual local — não representa uma transferência bancária real.</div><div id="final-id" class="receipt-id"></div>
+<div class="receipt-row"><span>Método</span><b id="final-method">—</b></div><div class="receipt-row"><span>Cartão</span><b id="final-card">—</b></div><div class="receipt-row"><span>Valor levantado</span><b id="final-amount">—</b></div><div id="final-human-message" style="margin:12px 0 4px;padding:13px;border-radius:14px;background:#0d211b;border:1px solid #285b4b;font-size:14px;font-weight:950;text-align:center;color:#9af0d1">Levantamento concluído</div><div class="receipt-row"><span>Equivalente</span><b id="final-equivalent">—</b></div><div class="receipt-row"><span>Destinatário</span><b id="final-name">—</b></div><div class="receipt-row"><span>Número / destino</span><b id="final-destination">—</b></div><div class="receipt-row"><span>Data e hora</span><b id="final-date">—</b></div><div class="receipt-row"><span>Processamento</span><b>Concluído</b></div>
+<div class="receipt-status">Nenhum banco, carteira ou provedor de pagamentos foi contactado por esta interface.</div></div>
+<button class="primary" onclick="resetWithdraw()">Novo levantamento</button><button class="secondary" onclick="goToPage('history')">Ver histórico</button>
+</div></div>
+
+</div></div></section>
+
+<section id="page-informacoes" class="page">
+<div class="page-head"><h1>Informações</h1><p>Central de notificações e atividade.</p></div>
+<div class="account-card"><div class="account-row"><span>Notificações pendentes</span><b id="pending-count">0</b></div><div class="account-row"><span>Notificações entregues</span><b id="delivered-count">0</b></div><div class="account-row"><span>Estado</span><b style="color:#20d19b">Ativo</b></div></div>
+<div class="section"><button class="primary" onclick="openNotification()">Agendar notificação</button></div>
+<div class="section"><div class="section-head"><div class="section-title">Notificações</div></div><div id="notification-list" style="display:flex;flex-direction:column;gap:8px"></div></div>
+</section>
+
+<section id="page-history" class="page"><div class="page-head"><h1>Histórico</h1><p>Movimentações registadas localmente.</p></div>
+<div class="section"><div class="info-grid"><div class="info-card"><span>Entradas</span><b id="hist-in">$0.00</b></div><div class="info-card"><span>Saídas</span><b id="hist-out">$0.00</b></div></div></div>
+<div class="section"><input id="history-search" class="field" placeholder="Pesquisar atividade..." oninput="renderHistory()"></div>
+<div class="section"><div id="history-list" style="display:flex;flex-direction:column;gap:8px"></div></div></section>
+
+<section id="page-account" class="page"><div class="page-head"><h1>Minha Conta</h1><p>Informações da conta.</p></div>
+<div class="account-card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:15px"><div style="width:51px;height:51px;border-radius:16px;background:#16241f;display:flex;align-items:center;justify-content:center">A</div><div><b style="font-size:14px">Arsénio Tomas Banta</b><span style="display:block;color:#707b84;font-size:9px;margin-top:3px">Titular da conta</span></div></div>
+<div class="account-row"><span>Estado</span><b style="color:#20d19b">Ativa</b></div><div class="account-row"><span>Moeda principal</span><b>USD</b></div><div class="account-row"><span>Conta</span><b>CardMZ Virtual</b></div></div></section>
+
+</div>
+
+<nav class="nav">
+<button id="nav-home" class="active" onclick="goToPage('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg><span>Início</span></button>
+<button id="nav-cards" onclick="goToPage('cards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg><span>Cartões</span></button>
+<button id="nav-informacoes" onclick="goToPage('informacoes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5A8.5 8.5 0 0 0 12 3.5Z"/><path d="M12 10v6"/><path d="M12 7h.01"/></svg><span>Informações</span><span id="nav-badge" class="badge">0</span></button>
+<button id="nav-history" onclick="goToPage('history')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12a8 8 0 1 0 2.35-5.65"/><path d="M4 5v5h5"/><path d="M12 7v5l3 2"/></svg><span>Histórico</span></button>
+</nav>
+
+<div id="deposit-modal" class="overlay"><div class="sheet"><div class="sheet-head"><div><h2>Adicionar valor</h2><p>Registo local de entrada</p></div><button class="close" onclick="closeOverlay('deposit-modal')">×</button></div>
+<label class="field-label">Moeda</label><div class="option-grid"><button id="dep-usd" class="option active" onclick="depCurrency='USD';setDepButtons()"><b>USD</b><span>Dólar americano</span></button><button id="dep-mzn" class="option" onclick="depCurrency='MZN';setDepButtons()"><b>MZN</b><span>Metical</span></button></div>
+<label class="field-label">Valor</label><input id="dep-amount" class="field amount-input" type="number" placeholder="0.00"><label class="field-label">Origem</label><select id="dep-origin" class="field"><option value="">Selecionar origem</option><option>PayPal</option><option>M-Pesa</option><option>e-Mola</option><option>Outro</option></select><button class="primary" onclick="deposit()">Adicionar ao saldo</button></div></div>
+
+<div id="card-modal" class="overlay"><div class="sheet"><div class="sheet-head"><div><h2>Adicionar cartão</h2><p>Crie um cartão visual.</p></div><button class="close" onclick="closeOverlay('card-modal')">×</button></div>
+<label class="field-label">Nome do titular</label><input id="new-card-name" class="field" placeholder="Nome completo"><label class="field-label">Tipo</label><select id="new-card-type" class="field"><option>Virtual</option><option>Virtual Premium</option><option>Físico</option></select><label class="field-label">Moeda</label><select id="new-card-currency" class="field"><option>USD</option><option>MZN</option><option>EUR</option></select><label class="field-label">Limite mensal</label><input id="new-card-limit" class="field" type="number" placeholder="1000"><label class="field-label">Validade</label><input id="new-card-expiry" class="field" placeholder="12/30"><button class="primary" onclick="addCard()">Criar cartão</button></div></div>
+
+<div id="notif-modal" class="overlay"><div class="sheet"><div class="sheet-head"><div><h2>Nova notificação</h2><p>Agende uma notificação local.</p></div><button class="close" onclick="closeOverlay('notif-modal')">×</button></div>
+<label class="field-label">Tipo</label><select id="notif-type" class="field"><option value="income">Entrada / recebimento</option><option value="withdrawal">Saída / levantamento</option></select>
+<label class="field-label">Nome / origem / destino</label><input id="notif-origin" class="field" placeholder="Ex.: João Silva"><label class="field-label">Valor</label><input id="notif-amount" class="field amount-input" type="number" placeholder="0.00">
+<label class="field-label">Atraso</label><select id="notif-delay" class="field"><option value="3">3 segundos</option><option value="5">5 segundos</option><option value="10">10 segundos</option><option value="30">30 segundos</option><option value="60">1 minuto</option><option value="300">5 minutos</option></select>
+<button class="primary" onclick="createNotification()">Agendar notificação</button></div></div>
+
+<div id="tab-processing" class="tab-processing"><div class="tab-processing-inner"><div class="tab-loader"></div><b id="tab-processing-title">A processar</b><span id="tab-processing-text">A preparar a próxima etapa...</span></div></div>
+
+<div id="toast" class="toast"><div class="toast-content"><div class="toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div><div class="toast-main"><div class="toast-top"><b id="toast-title" class="toast-title">Atualizado</b><span id="toast-time" class="toast-time">agora</span></div><p id="toast-message" class="toast-message"></p></div><button class="toast-close" onclick="hideToast()">×</button></div></div>
+
+<script>
+const EXCHANGE=63, STORAGE_KEY="cardmz_local_state_v6";
+const state={balance:0,currency:"USD",method:"mpesa",selectedCard:0,cards:[{id:1,name:"Arsénio Tomas Banta",type:"Virtual Premium",currency:"USD",limit:"1000",expiry:"02/30",number:"4323 •••• •••• 3454"}],history:[],notifications:[],deliveredNotifications:[],notificationTimers:{}};
+let depCurrency="USD",withdrawCurrency="USD",processingTimer=null;
+const methods={mpesa:"M-Pesa",emola:"e-Mola",paypal:"PayPal",bim:"Millennium BIM"};
+
+function money(v){return "$"+Number(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function escapeHTML(s){return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+function nowDate(){return new Date().toLocaleString("pt-PT",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}
+function goToPage(n){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById("page-"+n)?.classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));document.getElementById("nav-"+n)?.classList.add("active");if(n==="home")renderHome();if(n==="cards")renderCards();if(n==="withdraw")renderWithdrawCardSelection();if(n==="history")renderHistory();if(n==="informacoes")renderNotifications()}
+function updateBalance(){
+document.getElementById("home-balance").textContent=money(state.balance);document.getElementById("home-mzn").textContent="~ "+Math.round(state.balance*EXCHANGE).toLocaleString()+" MZN";
+const w=document.getElementById("withdraw-balance");if(w)w.textContent=money(state.balance);
+const c=document.getElementById("movement-count");if(c)c.textContent=state.history.length+" transaç"+(state.history.length===1?"ão registada":"ões registadas");
+let ins=state.history.filter(x=>x.type==="income").reduce((a,x)=>a+x.usd,0),outs=state.history.filter(x=>x.type==="withdrawal").reduce((a,x)=>a+x.usd,0);
+if(document.getElementById("hist-in"))document.getElementById("hist-in").textContent=money(ins);if(document.getElementById("hist-out"))document.getElementById("hist-out").textContent=money(outs);
+}
+function cardHTML(c){return `<div class="card"><div class="card-top"><div class="card-brand">CARDMZ ${escapeHTML(c.type).toUpperCase()}</div><div class="chip"></div></div><div class="card-number">${escapeHTML(c.number)}</div><div class="card-bottom"><div><div class="card-caption">Titular</div><div class="card-value">${escapeHTML(c.name).toUpperCase()}</div></div><div><div class="card-caption">Validade</div><div class="card-value">${escapeHTML(c.expiry)}</div></div><div class="card-network">${escapeHTML(c.currency)}</div></div></div>`}
+function renderHome(){updateBalance();let c=state.cards[state.selectedCard]||state.cards[0];document.getElementById("home-card").innerHTML=c?cardHTML(c):"";let h=document.getElementById("home-history");h.innerHTML=state.history.length?state.history.slice(0,4).map(txHTML).join(""):`<div class="empty">Nenhuma atividade registada.</div>`}
+function txHTML(t){let income=t.type==="income";return `<div class="tx"><div class="tx-icon" style="background:${income?"#10251e":"#28161a"}">${income?"↑":"↓"}</div><div class="tx-main"><div class="tx-name">${escapeHTML(t.entity)}</div><div class="tx-date">${escapeHTML(t.date)}</div></div><div class="tx-amount" style="color:${income?"#20d19b":"#ef6672"}">${income?"+":"−"}${Number(t.amount).toFixed(2)} ${escapeHTML(t.currency)}</div></div>`}
+function addHistory(type,entity,amount,currency="USD"){let usd=currency==="USD"?Number(amount):Number(amount)/EXCHANGE;if(type==="income")state.balance+=usd;else state.balance=Math.max(0,state.balance-usd);state.balance=Number(state.balance.toFixed(2));state.history.unshift({type,entity,amount:Number(amount),currency,usd,date:nowDate()});updateBalance();renderHome();renderHistory();persist()}
+function renderHistory(){let el=document.getElementById("history-list");if(!el)return;let q=(document.getElementById("history-search")?.value||"").toLowerCase(),a=state.history.filter(x=>x.entity.toLowerCase().includes(q));el.innerHTML=a.length?a.map(txHTML).join(""):`<div class="empty">Nenhuma transação encontrada.</div>`}
+function selectMethod(m){state.method=m;["mpesa","emola","paypal","bim"].forEach(x=>{document.getElementById("method-"+x)?.classList.toggle("active",x===m);document.getElementById("check-"+x).textContent=x===m?"✓":""});let l=document.getElementById("destination-label"),d=document.getElementById("destination");l.textContent=m==="paypal"?"E-mail ou conta PayPal":m==="bim"?"Número de conta":"Número "+methods[m];d.placeholder=m==="paypal"?"exemplo@email.com":m==="bim"?"Número da conta":"Ex.: 84 000 0000";updateReview()}
+function selectCard(i){if(!state.cards[i])return;state.selectedCard=i;renderCards();renderWithdrawCardSelection();renderHome();showToast("Cartão selecionado",state.cards[i].name+" foi definido.")}
+function renderWithdrawCardSelection(){let el=document.getElementById("withdraw-card-selection");if(!el)return;el.innerHTML=state.cards.map((c,i)=>`<button class="method ${i===state.selectedCard?"active":""}" onclick="selectCard(${i})"><div class="method-icon">▣</div><div><b>${escapeHTML(c.type)}</b><span>${escapeHTML(c.number)} · ${escapeHTML(c.currency)}</span></div><div class="check">${i===state.selectedCard?"✓":""}</div></button>`).join("")}
+function renderCards(){let el=document.getElementById("cards-list");if(!el)return;el.innerHTML=state.cards.map((c,i)=>`<div class="card-item" onclick="selectCard(${i})">${cardHTML(c)}<div class="card-details"><div class="card-details-row"><span>Tipo</span><b>${escapeHTML(c.type)}</b></div><div class="card-details-row"><span>Moeda</span><b>${escapeHTML(c.currency)}</b></div><div class="card-details-row"><span>Limite</span><b>${escapeHTML(c.limit)} ${escapeHTML(c.currency)}</b></div><div class="card-details-row"><span>Estado</span><b style="color:#20d19b">Ativo</b></div></div></div>`).join("");let c=state.cards[state.selectedCard];document.getElementById("selected-card-box").innerHTML=c?`<div class="selected-card"><div><b>Cartão utilizado</b><span>${escapeHTML(c.name)} · ${escapeHTML(c.number)}</span></div><button class="link">Selecionado</button></div>`:""}
+function setCurrency(c){withdrawCurrency=c;document.getElementById("cur-usd").classList.toggle("active",c==="USD");document.getElementById("cur-mzn").classList.toggle("active",c==="MZN");updateWithdrawPreview()}
+function updateWithdrawPreview(){let v=Number(document.getElementById("withdraw-amount").value||0),usd=withdrawCurrency==="USD"?v:v/EXCHANGE,eq=withdrawCurrency==="USD"?v*EXCHANGE:v;document.getElementById("sum-amount").textContent=v?v.toFixed(2)+" "+withdrawCurrency:"$0.00";document.getElementById("sum-equivalent").textContent=withdrawCurrency==="USD"?Math.round(eq).toLocaleString()+" MZN":usd.toFixed(2)+" USD";document.getElementById("sum-after").textContent=money(Math.max(0,state.balance-usd));document.getElementById("withdraw-usd-live").textContent=usd.toFixed(2)+" USD";document.getElementById("withdraw-mzn-live").textContent=Math.round(usd*EXCHANGE).toLocaleString()+" MZN";document.getElementById("amount-next").disabled=!(v>0&&usd<=state.balance)}
+let withdrawTransitionTimer=null;
+function withdrawNext(n){let current=Number(document.querySelector(".withdraw-step.active")?.id?.replace("w","")||1);if(n>current&&n<6){clearTimeout(withdrawTransitionTimer);document.getElementById("tab-processing-title").textContent="A processar etapa";document.getElementById("tab-processing-text").textContent="A preparar a próxima aba...";document.getElementById("tab-processing").classList.add("show");withdrawTransitionTimer=setTimeout(()=>{document.getElementById("tab-processing").classList.remove("show");showWithdrawStep(n)},720);return}showWithdrawStep(n)}
+function showWithdrawStep(n){document.querySelectorAll(".withdraw-step").forEach(x=>x.classList.remove("active"));document.getElementById("w"+n)?.classList.add("active");for(let i=1;i<=7;i++)document.getElementById("s"+i)?.classList.toggle("active",i<=n);if(n===2)renderWithdrawCardSelection();if(n===3){updateBalance();updateWithdrawPreview()}if(n>=4)updateReview();if(n===7){document.getElementById("tab-processing").classList.remove("show")}}
+function updateReview(){let v=Number(document.getElementById("withdraw-amount")?.value||0),c=state.cards[state.selectedCard];document.getElementById("review-method").textContent=methods[state.method];document.getElementById("review-amount").textContent=v.toFixed(2)+" "+withdrawCurrency;document.getElementById("review-destination").textContent=document.getElementById("destination")?.value||"Não informado";if(c)document.getElementById("review-card").textContent=c.type+" · "+c.number}
+function validateDestination(){let d=document.getElementById("destination").value.trim(),n=document.getElementById("destination-name").value.trim();if(!d||!n){showToast("Dados incompletos","Preencha o destino e o nome para continuar.");return}let v=Number(document.getElementById("withdraw-amount").value||0),c=state.cards[state.selectedCard];document.getElementById("confirm-method").textContent=methods[state.method];document.getElementById("confirm-card").textContent=c.type+" · "+c.number;document.getElementById("confirm-amount").textContent=v.toFixed(2)+" "+withdrawCurrency;document.getElementById("confirm-name").textContent=n;document.getElementById("confirm-destination").textContent=d;withdrawNext(5)}
+function startWithdrawProcessing(){
+let amount=Number(document.getElementById("withdraw-amount").value||0),usd=withdrawCurrency==="USD"?amount:amount/EXCHANGE;
+if(amount<=0||usd>state.balance){showToast("Valor inválido","O valor informado não está disponível.");return}
+withdrawNext(6);clearInterval(processingTimer);
+const total=35,stages=[
+["Validando dados","Verificando valor, moeda e método selecionado."],
+["Conferindo cartão","Associando o cartão escolhido à operação."],
+["Validando valor","Conferindo o valor disponível localmente."],
+["Conferindo destino","Lendo o número ou conta informada."],
+["Registando operação local","Criando o registo local desta operação."],
+["Finalizando processamento","Preparando a confirmação visual."]
+];
+let elapsed=0;
+document.getElementById("processing-seconds").textContent=total;
+document.querySelectorAll(".log").forEach(x=>x.classList.remove("ok"));
+processingTimer=setInterval(()=>{elapsed++;let p=Math.min(100,Math.round(elapsed/total*100)),stage=Math.min(5,Math.floor((elapsed-1)/(total/6)));document.getElementById("processing-seconds").textContent=Math.max(0,total-elapsed);document.getElementById("progress-bar").style.width=p+"%";document.getElementById("progress-percent").textContent=p+"%";document.getElementById("processing-title").textContent=stages[stage][0];document.getElementById("processing-text").textContent=stages[stage][1];document.getElementById("stage-name").textContent="Etapa "+(stage+1)+" de 6 — "+stages[stage][0];document.getElementById("stage-detail").textContent=stages[stage][1];for(let i=1;i<=stage+1;i++)document.getElementById("log"+i).classList.add("ok");if(elapsed>=total){clearInterval(processingTimer);finishWithdraw(amount,usd)}},1000)}
+function finishWithdraw(amount,usd){
+let c=state.cards[state.selectedCard],destination=document.getElementById("destination").value.trim(),name=document.getElementById("destination-name").value.trim(),date=nowDate(),ref="CMZ-"+Math.random().toString(36).slice(2,10).toUpperCase();
+state.balance=Number(Math.max(0,state.balance-usd).toFixed(2));state.history.unshift({type:"withdrawal",entity:methods[state.method],amount,currency:withdrawCurrency,usd,date});updateBalance();renderHome();renderHistory();
+document.getElementById("final-id").textContent=ref;document.getElementById("final-method").textContent=methods[state.method];document.getElementById("final-card").textContent=c.number;document.getElementById("final-amount").textContent=amount.toFixed(2)+" "+withdrawCurrency;document.getElementById("final-equivalent").textContent=usd.toFixed(2)+" USD · "+Math.round(usd*EXCHANGE).toLocaleString()+" MZN";document.getElementById("final-human-message").textContent="Levantaste "+amount.toFixed(2)+" "+withdrawCurrency;document.getElementById("final-name").textContent=name;document.getElementById("final-destination").textContent=destination;document.getElementById("final-date").textContent=date;withdrawNext(7);
+showToast("Levantamento confirmado",name+"|"+usd.toFixed(2)+" USD|≈ "+Math.round(usd*EXCHANGE).toLocaleString()+" MZN");
+persist()}
+function resetWithdraw(){document.getElementById("withdraw-amount").value="";document.getElementById("destination").value="";document.getElementById("destination-name").value="";document.getElementById("destination-note").value="";withdrawNext(1)}
+function openDeposit(){document.getElementById("deposit-modal").classList.add("show")}
+function setDepButtons(){document.getElementById("dep-usd").classList.toggle("active",depCurrency==="USD");document.getElementById("dep-mzn").classList.toggle("active",depCurrency==="MZN")}
+function deposit(){let a=Number(document.getElementById("dep-amount").value||0),o=document.getElementById("dep-origin").value;if(a<=0||!o){showToast("Dados incompletos","Preencha o valor e a origem.");return}addHistory("income",o,a,depCurrency);closeOverlay("deposit-modal");document.getElementById("dep-amount").value="";showToast("Valor registado","+"+a.toFixed(2)+" "+depCurrency+" · "+o)}
+function openCardModal(){document.getElementById("card-modal").classList.add("show")}
+function addCard(){let name=document.getElementById("new-card-name").value.trim();if(!name){showToast("Nome necessário","Informe o nome do titular.");return}let c={id:Date.now(),name,type:document.getElementById("new-card-type").value,currency:document.getElementById("new-card-currency").value,limit:document.getElementById("new-card-limit").value||"1000",expiry:document.getElementById("new-card-expiry").value||"12/30",number:"4323 •••• •••• "+Math.floor(1000+Math.random()*8999)};state.cards.push(c);state.selectedCard=state.cards.length-1;renderCards();renderWithdrawCardSelection();renderHome();closeOverlay("card-modal");document.getElementById("new-card-name").value="";showToast("Cartão criado",name+" foi criado e selecionado.")}
+function openNotification(){document.getElementById("notif-modal").classList.add("show")}
+function createNotification(){let type=document.getElementById("notif-type").value,origin=document.getElementById("notif-origin").value.trim(),amount=Number(document.getElementById("notif-amount").value||0),delay=Number(document.getElementById("notif-delay").value);if(!origin||amount<=0){showToast("Dados incompletos","Preencha o nome e o valor.");return}let n={id:Date.now(),type,origin,amount,at:Date.now()+delay*1000,delivered:false};state.notifications.push(n);scheduleNotification(n);closeOverlay("notif-modal");document.getElementById("notif-origin").value="";document.getElementById("notif-amount").value="";renderNotifications();updateBadge();persist();showToast("Notificação agendada","Será apresentada após "+formatDelay(delay)+".")}
+function formatDelay(s){return s<60?s+" segundo"+(s===1?"":"s"):Math.floor(s/60)+" minuto"+(s===60?"":"s")}
+function scheduleNotification(n){state.notificationTimers[n.id]=setTimeout(()=>deliverNotification(n.id),Math.max(0,n.at-Date.now()))}
+function deliverNotification(id){let i=state.notifications.findIndex(x=>x.id===id);if(i<0)return;let n=state.notifications[i];state.notifications.splice(i,1);n.delivered=true;n.deliveredAt=Date.now();state.deliveredNotifications.unshift(n);delete state.notificationTimers[id];addHistory(n.type,n.origin,n.amount,"USD");updateBadge();renderNotifications();showConfirmationNotification(n);persist()}
+function showConfirmationNotification(n){let usd=n.type==="income"?Number(n.amount):Number(n.amount),mzn=Math.round(usd*EXCHANGE);showToast(n.type==="income"?"Recebimento confirmado":"Operação confirmada",n.origin+"|"+(n.type==="income"?"+":"−")+usd.toFixed(2)+" USD|≈ "+mzn.toLocaleString()+" MZN")}
+function hideToast(){document.getElementById("toast").classList.remove("show")}
+function showToast(title,message){document.getElementById("toast-title").textContent=title;let parts=String(message).split("|");document.getElementById("toast-message").innerHTML=parts.length>=3?`<div class="toast-sender">${escapeHTML(parts[0])}</div><div class="toast-usd">${escapeHTML(parts[1])}</div><div class="toast-mzn">${escapeHTML(parts[2])}</div>`:escapeHTML(message);document.getElementById("toast-time").textContent="agora";let t=document.getElementById("toast");t.classList.add("show");clearTimeout(window.toastTimeout);window.toastTimeout=setTimeout(hideToast,7000)}
+function closeOverlay(id){document.getElementById(id)?.classList.remove("show")}
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)o.classList.remove("show")}));
+function renderNotifications(){let el=document.getElementById("notification-list");if(!el)return;let h=state.notifications.map(n=>`<div class="notification-item"><div class="notification-icon" style="background:#10251e">◷</div><div class="notification-main"><b>${escapeHTML(n.origin)}</b><span>Notificação pendente · aparece em ${formatRemaining(n.at)}</span></div><div class="notification-amount usd">${n.amount.toFixed(2)} USD</div><button class="notification-remove" onclick="removeNotification(${n.id})">×</button></div>`).join("");h+=state.deliveredNotifications.slice(0,10).map(n=>{let usd=Number(n.amount),mzn=Math.round(usd*EXCHANGE);return `<div class="notification-item"><div class="notification-icon" style="background:#10251e;color:#20d19b">✓</div><div class="notification-main"><b>${escapeHTML(n.origin)}</b><span>${n.type==="income"?"Valor recebido":"Levantamento"} · ${new Date(n.deliveredAt).toLocaleString("pt-PT")}</span></div><div><div class="notification-amount usd">${n.type==="income"?"+":"−"}${usd.toFixed(2)} USD</div><div style="font-size:9px;color:#9af0d1;text-align:right;font-weight:800">≈ ${mzn.toLocaleString()} MZN</div></div></div>`}).join("");el.innerHTML=h||`<div class="empty">Nenhuma notificação registada.</div>`}
+function formatRemaining(t){let s=Math.max(0,Math.ceil((t-Date.now())/1000));return s<60?s+"s":Math.ceil(s/60)+"min"}
+function removeNotification(id){clearTimeout(state.notificationTimers[id]);delete state.notificationTimers[id];state.notifications=state.notifications.filter(x=>x.id!==id);renderNotifications();updateBadge();persist()}
+function updateBadge(){let c=state.notifications.length,b=document.getElementById("nav-badge");b.textContent=c;b.style.display=c?"flex":"none";document.getElementById("pending-count").textContent=c;document.getElementById("delivered-count").textContent=state.deliveredNotifications.length}
+function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({balance:state.balance,method:state.method,selectedCard:state.selectedCard,cards:state.cards,history:state.history,notifications:state.notifications,deliveredNotifications:state.deliveredNotifications}))}catch(e){}}
+function loadState(){try{let s=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(!s)return;if(typeof s.balance==="number")state.balance=s.balance;if(Array.isArray(s.cards)&&s.cards.length)state.cards=s.cards;if(Array.isArray(s.history))state.history=s.history;if(Array.isArray(s.notifications))state.notifications=s.notifications;if(Array.isArray(s.deliveredNotifications))state.deliveredNotifications=s.deliveredNotifications;if(Number.isInteger(s.selectedCard))state.selectedCard=Math.min(s.selectedCard,state.cards.length-1);if(s.method)state.method=s.method}catch(e){}}
+function recoverNotifications(){state.notifications.slice().forEach(n=>n.at<=Date.now()?setTimeout(()=>deliverNotification(n.id),250):scheduleNotification(n));updateBadge()}
+loadState();updateBalance();renderHome();renderCards();renderWithdrawCardSelection();renderHistory();renderNotifications();updateBadge();recoverNotifications();
+setInterval(()=>{if(state.notifications.length){renderNotifications();updateBadge()}},1000);
+setInterval(persist,1500);
+window.addEventListener("beforeunload",persist);
+</script>
+</div>
+</body>
+</html>
