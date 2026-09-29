@@ -1,0 +1,5216 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#080b0f"/>
+<title>CardMZ — Virtual CardMZ</title>
+
+<style>
+*{
+ box-sizing:border-box;
+ -webkit-tap-highlight-color:transparent;
+ scrollbar-width:none;
+}
+*::-webkit-scrollbar{display:none}
+
+:root{
+ --bg:#070a0e;
+ --panel:#0e141a;
+ --panel2:#121a21;
+ --panel3:#172129;
+ --line:#27323b;
+ --line2:#33414b;
+ --text:#f5f8fa;
+ --muted:#7e8a95;
+ --green:#20d19b;
+ --green2:#16a879;
+ --green3:#9af0d1;
+ --red:#ef6672;
+ --blue:#5b9cff;
+ --gold:#dcb55f;
+ --purple:#aa91f5;
+ --shadow:0 22px 55px rgba(0,0,0,.38);
+}
+
+html,body{
+ margin:0;
+ width:100%;
+ height:100%;
+ overflow:hidden;
+ background:var(--bg);
+ color:var(--text);
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
+button,input,select{font:inherit}
+button{color:inherit}
+
+.app{
+ width:100%;
+ max-width:520px;
+ height:100dvh;
+ margin:auto;
+ background:
+  radial-gradient(circle at 50% -20%,rgba(32,209,155,.055),transparent 34%),
+  var(--bg);
+ display:flex;
+ flex-direction:column;
+ position:relative;
+ overflow:hidden;
+}
+
+.pages{
+ flex:1;
+ min-height:0;
+ position:relative;
+ overflow:hidden;
+}
+
+.page{
+ display:none;
+ width:100%;
+ height:100%;
+ overflow-y:auto;
+ padding-bottom:38px;
+ scroll-behavior:smooth;
+}
+
+.page.active{
+ display:block;
+ animation:pageIn .28s ease;
+}
+
+@keyframes pageIn{
+ from{opacity:0;transform:translateX(18px)}
+ to{opacity:1;transform:translateX(0)}
+}
+
+.top{
+ padding:24px 18px 14px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+}
+
+.brand{
+ display:flex;
+ align-items:center;
+ gap:11px;
+}
+
+.brand-icon{
+ width:44px;
+ height:44px;
+ border-radius:14px;
+ background:linear-gradient(145deg,#1d292f,#0c1318);
+ border:1px solid #34434b;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+
+.brand-icon svg{
+ width:24px;
+ height:24px;
+}
+
+.top-title{
+ font-size:15px;
+ font-weight:850;
+}
+
+.top-sub{
+ font-size:10px;
+ color:var(--muted);
+ margin-top:3px;
+}
+
+.status{
+ display:flex;
+ align-items:center;
+ gap:7px;
+ padding:8px 11px;
+ border:1px solid #273b35;
+ border-radius:999px;
+ background:#0b1613;
+ color:#9de9d0;
+ font-size:10px;
+ font-weight:800;
+}
+
+.status-dot{
+ width:7px;
+ height:7px;
+ border-radius:50%;
+ background:var(--green);
+ box-shadow:0 0 12px rgba(32,209,155,.7);
+}
+
+.balance-box{
+ margin:6px 17px 17px;
+ padding:21px;
+ border:1px solid var(--line);
+ border-radius:22px;
+ background:
+  radial-gradient(circle at 100% 0%,rgba(32,209,155,.08),transparent 34%),
+  linear-gradient(145deg,#121a21,#0c1116);
+ box-shadow:0 12px 35px rgba(0,0,0,.2);
+}
+
+.label{
+ font-size:9px;
+ color:var(--muted);
+ letter-spacing:1.4px;
+ text-transform:uppercase;
+ font-weight:750;
+}
+
+.balance{
+ font-size:45px;
+ line-height:1.05;
+ font-weight:900;
+ letter-spacing:-2.3px;
+ margin:7px 0 3px;
+}
+
+.balance-conversion{
+ color:#ef6672;
+ font-size:10px;
+ font-weight:850;
+ margin-top:2px;
+}
+
+.mzn{
+ font-size:12px;
+ color:var(--green3);
+ margin-top:4px;
+}
+
+.balance-meta{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:9px;
+ margin-top:19px;
+}
+
+.mini{
+ background:#0b1015;
+ border:1px solid #222d35;
+ border-radius:14px;
+ padding:12px;
+}
+
+.mini b{
+ display:block;
+ font-size:13px;
+ margin-top:5px;
+}
+
+.mini span{
+ font-size:9px;
+ color:var(--muted);
+}
+
+.card{
+ border-radius:26px;
+ padding:24px;
+ position:relative;
+ overflow:hidden;
+ min-height:218px;
+ background:
+  radial-gradient(circle at 85% 8%,rgba(255,255,255,.13),transparent 24%),
+  radial-gradient(circle at 10% 100%,rgba(32,209,155,.12),transparent 32%),
+  linear-gradient(135deg,#253438 0%,#121b1e 42%,#080c10 100%);
+ border:1px solid #405057;
+ box-shadow:
+  0 22px 48px rgba(0,0,0,.34),
+  inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.card:before{
+ content:"";
+ position:absolute;
+ width:280px;
+ height:280px;
+ right:-145px;
+ bottom:-185px;
+ border-radius:50%;
+ border:1px solid rgba(255,255,255,.055);
+ box-shadow:
+  0 0 0 30px rgba(255,255,255,.012),
+  0 0 0 60px rgba(255,255,255,.008);
+}
+
+.card:after{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.025) 50%,transparent 80%);
+ pointer-events:none;
+}
+
+.card-top,
+.card-bottom{
+ position:relative;
+ z-index:2;
+}
+
+.card-top{
+ display:flex;
+ justify-content:space-between;
+ align-items:flex-start;
+}
+
+.card-brand{
+ font-size:10px;
+ font-weight:850;
+ letter-spacing:2.1px;
+ color:#b7ddd2;
+}
+
+.chip{
+ width:46px;
+ height:32px;
+ border-radius:7px;
+ background:
+  linear-gradient(90deg,transparent 30%,rgba(50,40,18,.28) 31%,transparent 32%),
+  linear-gradient(135deg,#a68c52,#e2cb91,#806b3d);
+ border:1px solid rgba(255,255,255,.18);
+ position:relative;
+}
+
+.chip:after,
+.chip:before{
+ content:"";
+ position:absolute;
+ border:1px solid rgba(35,27,10,.45);
+}
+
+.chip:after{
+ inset:7px 0;
+ border-left:0;
+ border-right:0;
+}
+
+.chip:before{
+ inset:0 13px;
+ border-top:0;
+ border-bottom:0;
+}
+
+.card-number{
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+ font-size:20px;
+ letter-spacing:3.5px;
+ margin:39px 0 30px;
+ text-shadow:0 2px 5px rgba(0,0,0,.4);
+}
+
+.card-bottom{
+ display:flex;
+ justify-content:space-between;
+ align-items:flex-end;
+ gap:12px;
+}
+
+.card-caption{
+ font-size:7px;
+ color:#7e8c91;
+ letter-spacing:1.2px;
+ text-transform:uppercase;
+}
+
+.card-value{
+ font-size:11px;
+ font-weight:800;
+ margin-top:4px;
+ max-width:185px;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+}
+
+.card-network{
+ font-size:12px;
+ font-weight:850;
+ letter-spacing:1px;
+}
+
+.section{
+ padding:0 17px;
+ margin-top:19px;
+}
+
+.section-head{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ margin-bottom:11px;
+}
+
+.section-title{
+ font-size:14px;
+ font-weight:850;
+}
+
+.link{
+ border:0;
+ background:none;
+ color:#69dfbd;
+ font-size:10px;
+ font-weight:750;
+ cursor:pointer;
+}
+
+.actions{
+ display:grid;
+ grid-template-columns:repeat(2,1fr);
+ gap:10px;
+}
+
+.action{
+ min-height:78px;
+ border:1px solid var(--line);
+ background:linear-gradient(145deg,#111820,#0d1318);
+ border-radius:17px;
+ padding:13px;
+ display:flex;
+ align-items:center;
+ gap:12px;
+ cursor:pointer;
+ text-align:left;
+ transition:.2s ease;
+}
+
+.action:active{
+ transform:scale(.98);
+}
+
+.action-icon{
+ width:43px;
+ height:43px;
+ border-radius:13px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+}
+
+.action-icon svg{
+ width:22px;
+ height:22px;
+}
+
+.action span{
+ font-size:11px;
+ color:#d5dade;
+ font-weight:700;
+}
+
+.info-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+}
+
+.info-card{
+ background:linear-gradient(145deg,#111820,#0d1318);
+ border:1px solid var(--line);
+ border-radius:17px;
+ padding:15px;
+ min-height:110px;
+}
+
+.info-card b{
+ display:block;
+ font-size:12px;
+}
+
+.info-card span{
+ display:block;
+ color:var(--muted);
+ font-size:9px;
+ margin-top:5px;
+ line-height:1.5;
+}
+
+.tx{
+ background:linear-gradient(145deg,#111820,#0d1318);
+ border:1px solid var(--line);
+ border-radius:16px;
+ padding:13px;
+ display:flex;
+ align-items:center;
+ gap:11px;
+}
+
+.tx-icon{
+ width:42px;
+ height:42px;
+ border-radius:13px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+}
+
+.tx-main{
+ flex:1;
+ min-width:0;
+}
+
+.tx-name{
+ font-size:12px;
+ font-weight:750;
+ white-space:nowrap;
+ overflow:hidden;
+ text-overflow:ellipsis;
+}
+
+.tx-date{
+ font-size:9px;
+ color:var(--muted);
+ margin-top:4px;
+}
+
+.tx-amount{
+ font-size:12px;
+ font-weight:850;
+ text-align:right;
+}
+
+.tx-conversion{
+ font-size:8px;
+ color:#ef6672;
+ margin-top:3px;
+}
+
+.nav{
+ height:72px;
+ background:rgba(14,19,24,.98);
+ border-top:1px solid var(--line);
+ display:flex;
+ flex-shrink:0;
+ backdrop-filter:blur(20px);
+}
+
+.nav button{
+ flex:1;
+ border:0;
+ background:none;
+ color:#6f7b85;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ gap:5px;
+ font-size:9px;
+ cursor:pointer;
+ position:relative;
+}
+
+.nav button.active{
+ color:var(--green);
+}
+
+.nav svg{
+ width:22px;
+ height:22px;
+}
+
+.badge{
+ position:absolute;
+ top:7px;
+ right:25%;
+ min-width:17px;
+ height:17px;
+ padding:0 4px;
+ border-radius:9px;
+ background:var(--green);
+ color:#06110d;
+ font-size:8px;
+ font-weight:900;
+ display:none;
+ align-items:center;
+ justify-content:center;
+}
+
+.page-head{
+ padding:25px 18px 12px;
+}
+
+.page-head h1{
+ font-size:25px;
+ margin:0;
+ font-weight:900;
+ letter-spacing:-.5px;
+}
+
+.page-head p{
+ font-size:10px;
+ color:var(--muted);
+ margin:6px 0 0;
+ line-height:1.5;
+}
+
+.card-slider{
+ display:flex;
+ gap:15px;
+ overflow-x:auto;
+ padding:11px 17px 20px;
+ scroll-snap-type:x mandatory;
+}
+
+.card-item{
+ min-width:90%;
+ max-width:390px;
+ scroll-snap-align:center;
+}
+
+.card-details{
+ margin-top:10px;
+ background:linear-gradient(145deg,#111820,#0d1318);
+ border:1px solid var(--line);
+ border-radius:16px;
+ padding:14px;
+}
+
+.card-details-row{
+ display:flex;
+ justify-content:space-between;
+ gap:10px;
+ padding:9px 0;
+ border-bottom:1px solid #202a31;
+}
+
+.card-details-row:last-child{
+ border:0;
+}
+
+.card-details-row span{
+ font-size:9px;
+ color:var(--muted);
+}
+
+.card-details-row b{
+ font-size:10px;
+ text-align:right;
+}
+
+.selected-card{
+ margin:0 17px 11px;
+ padding:12px 14px;
+ border-radius:15px;
+ border:1px solid rgba(32,209,155,.25);
+ background:rgba(32,209,155,.055);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+}
+
+.selected-card b{
+ font-size:10px;
+}
+
+.selected-card span{
+ display:block;
+ font-size:9px;
+ color:var(--muted);
+ margin-top:3px;
+}
+
+.select-card-btn{
+ border:1px solid #285f4f;
+ background:#10221d;
+ color:#8fe9cd;
+ border-radius:10px;
+ padding:8px 10px;
+ font-size:9px;
+ font-weight:800;
+}
+
+.add-card-btn{
+ width:calc(100% - 34px);
+ margin:0 17px;
+ height:58px;
+ border-radius:16px;
+ background:#10171d;
+ border:1px dashed #39464e;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:9px;
+ font-size:11px;
+ font-weight:800;
+ cursor:pointer;
+}
+
+.withdraw-wrap{
+ padding:0 17px;
+}
+
+.stepbar{
+ display:flex;
+ gap:5px;
+ margin:8px 0 18px;
+}
+
+.step{
+ flex:1;
+ height:4px;
+ border-radius:8px;
+ background:#252e35;
+ transition:.35s ease;
+}
+
+.step.active{
+ background:linear-gradient(90deg,var(--green2),var(--green));
+ box-shadow:0 0 10px rgba(32,209,155,.18);
+}
+
+.withdraw-panel{
+ background:linear-gradient(145deg,#111820,#0c1217);
+ border:1px solid var(--line);
+ border-radius:22px;
+ padding:19px;
+ box-shadow:0 15px 40px rgba(0,0,0,.18);
+}
+
+.withdraw-step{
+ display:none;
+}
+
+.withdraw-step.active{
+ display:block;
+ animation:stepIn .38s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes stepIn{
+ from{opacity:0;transform:translateX(28px) scale(.985)}
+ to{opacity:1;transform:translateX(0) scale(1)}
+}
+
+.method{
+ width:100%;
+ border:1px solid var(--line);
+ background:#0b1116;
+ border-radius:17px;
+ padding:15px;
+ display:flex;
+ align-items:center;
+ gap:13px;
+ margin-bottom:9px;
+ text-align:left;
+ cursor:pointer;
+ transition:.22s ease;
+}
+
+.method:active{
+ transform:scale(.99);
+}
+
+.method.active{
+ border-color:#3b8e76;
+ background:
+  radial-gradient(circle at 0 50%,rgba(32,209,155,.08),transparent 40%),
+  #0f1b18;
+}
+
+.method-icon{
+ width:48px;
+ height:48px;
+ border-radius:14px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+ border:1px solid rgba(255,255,255,.05);
+}
+
+.method-icon svg{
+ width:26px;
+ height:26px;
+}
+
+.method b{
+ font-size:12px;
+ font-weight:850;
+}
+
+.method span{
+ display:block;
+ color:var(--muted);
+ font-size:9px;
+ margin-top:4px;
+ line-height:1.35;
+}
+
+.check{
+ margin-left:auto;
+ width:22px;
+ height:22px;
+ border-radius:50%;
+ border:1px solid #3a454d;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:#07120e;
+ font-size:12px;
+ font-weight:900;
+ flex-shrink:0;
+}
+
+.method.active .check{
+ background:var(--green);
+ border-color:var(--green);
+}
+
+.field-label{
+ display:block;
+ color:#8b969f;
+ font-size:9px;
+ text-transform:uppercase;
+ letter-spacing:.9px;
+ margin:15px 0 7px;
+ font-weight:750;
+}
+
+.field{
+ width:100%;
+ height:52px;
+ border:1px solid #2a353e;
+ border-radius:14px;
+ background:#090f14;
+ color:#fff;
+ padding:0 14px;
+ outline:none;
+ transition:.2s ease;
+}
+
+.field:focus{
+ border-color:#3e927a;
+ box-shadow:0 0 0 3px rgba(32,209,155,.06);
+}
+
+.amount-input{
+ height:61px;
+ font-size:24px;
+ font-weight:900;
+ letter-spacing:-.5px;
+}
+
+.amount-preview{
+ margin-top:8px;
+ padding:11px 13px;
+ border-radius:13px;
+ background:#0a1015;
+ border:1px solid #252f36;
+}
+
+.amount-preview .literal{
+ color:#ef6672;
+ font-size:10px;
+ font-weight:850;
+}
+
+.amount-preview .converted{
+ color:#9af0d1;
+ font-size:14px;
+ font-weight:900;
+ margin-top:4px;
+}
+
+.summary{
+ margin-top:13px;
+ border:1px solid #29343c;
+ background:#090f14;
+ border-radius:16px;
+ padding:14px;
+}
+
+.summary-row{
+ display:flex;
+ justify-content:space-between;
+ gap:12px;
+ font-size:10px;
+ margin:8px 0;
+}
+
+.summary-row span{
+ color:var(--muted);
+}
+
+.summary-row b{
+ font-size:11px;
+ text-align:right;
+}
+
+.primary{
+ width:100%;
+ min-height:53px;
+ border:0;
+ border-radius:15px;
+ background:linear-gradient(135deg,#28d9a2,#17b783);
+ color:#03110c;
+ font-size:11px;
+ font-weight:900;
+ cursor:pointer;
+ margin-top:14px;
+ box-shadow:0 10px 22px rgba(22,167,125,.14);
+}
+
+.primary:active{
+ transform:scale(.985);
+}
+
+.primary:disabled{
+ opacity:.35;
+ cursor:not-allowed;
+ box-shadow:none;
+}
+
+.secondary{
+ width:100%;
+ height:49px;
+ border:1px solid var(--line);
+ border-radius:15px;
+ background:#10161c;
+ color:#fff;
+ font-size:10px;
+ font-weight:800;
+ cursor:pointer;
+ margin-top:8px;
+}
+
+.processing{
+ text-align:center;
+ padding:10px 4px 4px;
+}
+
+.processing-icon{
+ width:104px;
+ height:104px;
+ margin:10px auto 22px;
+ border-radius:50%;
+ border:1px solid #31443e;
+ background:
+  radial-gradient(circle,rgba(32,209,155,.09),transparent 65%),
+  #0b1513;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ position:relative;
+}
+
+.processing-icon:before{
+ content:"";
+ position:absolute;
+ inset:5px;
+ border-radius:50%;
+ border:3px solid #263a34;
+ border-top-color:var(--green);
+ border-right-color:#8cebd0;
+ animation:rotate 1.1s linear infinite;
+}
+
+.processing-icon:after{
+ content:"";
+ position:absolute;
+ inset:13px;
+ border-radius:50%;
+ border:1px dashed rgba(32,209,155,.25);
+ animation:rotateReverse 3s linear infinite;
+}
+
+@keyframes rotate{
+ to{transform:rotate(360deg)}
+}
+
+@keyframes rotateReverse{
+ to{transform:rotate(-360deg)}
+}
+
+.processing h2{
+ font-size:19px;
+ margin:0;
+ font-weight:900;
+}
+
+.processing p{
+ font-size:10px;
+ color:var(--muted);
+ line-height:1.6;
+ margin:7px 0;
+}
+
+.processing-number{
+ font-size:34px;
+ font-weight:900;
+ letter-spacing:-1px;
+ margin-top:17px;
+}
+
+.processing-unit{
+ font-size:8px;
+ color:#69747d;
+ letter-spacing:1.4px;
+ margin-top:1px;
+}
+
+.progress{
+ height:6px;
+ background:#202930;
+ border-radius:10px;
+ overflow:hidden;
+ margin:20px 0 9px;
+}
+
+.progress-bar{
+ height:100%;
+ width:0;
+ background:linear-gradient(90deg,var(--green2),var(--green3));
+ transition:width 1s linear;
+ border-radius:10px;
+}
+
+.processing-log{
+ text-align:left;
+ background:#090f14;
+ border:1px solid #252f36;
+ border-radius:15px;
+ padding:12px;
+ margin-top:16px;
+}
+
+.log{
+ display:flex;
+ gap:9px;
+ align-items:center;
+ font-size:9px;
+ color:#68737d;
+ padding:7px 0;
+ transition:.25s ease;
+}
+
+.log.ok{
+ color:#a8decf;
+}
+
+.log-dot{
+ width:7px;
+ height:7px;
+ border-radius:50%;
+ background:#3c474f;
+ flex-shrink:0;
+}
+
+.log.ok .log-dot{
+ background:var(--green);
+ box-shadow:0 0 9px rgba(32,209,155,.35);
+}
+
+.receipt{
+ border:1px solid #30443c;
+ background:
+  radial-gradient(circle at 50% 0%,rgba(32,209,155,.06),transparent 32%),
+  #0d1513;
+ border-radius:19px;
+ padding:18px;
+}
+
+.demo{
+ text-align:center;
+ background:#211d12;
+ color:#e4c77d;
+ border:1px solid #594a27;
+ border-radius:9px;
+ padding:8px;
+ font-size:8px;
+ font-weight:900;
+ letter-spacing:1px;
+ margin-bottom:14px;
+}
+
+.receipt-success{
+ width:76px;
+ height:76px;
+ margin:3px auto 15px;
+ border-radius:50%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#0d241c;
+ border:1px solid #2d725b;
+}
+
+.receipt-title{
+ text-align:center;
+ font-size:18px;
+ font-weight:900;
+}
+
+.receipt-sub{
+ text-align:center;
+ font-size:9px;
+ color:var(--muted);
+ margin-top:5px;
+ line-height:1.5;
+}
+
+.receipt-id{
+ text-align:center;
+ font-family:ui-monospace,monospace;
+ font-size:9px;
+ color:#8c979f;
+ margin:11px 0 16px;
+}
+
+.receipt-row{
+ display:flex;
+ justify-content:space-between;
+ gap:14px;
+ border-bottom:1px solid #27302f;
+ padding:10px 0;
+}
+
+.receipt-row:last-of-type{
+ border-bottom:0;
+}
+
+.receipt-row span{
+ font-size:9px;
+ color:var(--muted);
+}
+
+.receipt-row b{
+ font-size:10px;
+ text-align:right;
+ max-width:65%;
+ word-break:break-word;
+}
+
+.receipt-status{
+ margin-top:15px;
+ padding:11px;
+ border-radius:12px;
+ background:rgba(32,209,155,.06);
+ border:1px solid rgba(32,209,155,.2);
+ text-align:center;
+ color:#8ddbc4;
+ font-size:9px;
+ font-weight:750;
+ line-height:1.5;
+}
+
+.account-card,
+.support-card{
+ margin:0 17px 11px;
+ padding:16px;
+ border:1px solid var(--line);
+ background:linear-gradient(145deg,#111820,#0d1318);
+ border-radius:17px;
+}
+
+.account-row{
+ display:flex;
+ justify-content:space-between;
+ gap:14px;
+ padding:11px 0;
+ border-bottom:1px solid #222b32;
+}
+
+.account-row:last-child{
+ border:0;
+}
+
+.account-row span{
+ font-size:9px;
+ color:var(--muted);
+}
+
+.account-row b{
+ font-size:10px;
+ text-align:right;
+}
+
+.support{
+ display:flex;
+ align-items:center;
+ gap:11px;
+ padding:11px 0;
+ border-bottom:1px solid #222b32;
+}
+
+.support:last-child{
+ border-bottom:0;
+}
+
+.support-icon{
+ width:42px;
+ height:42px;
+ border-radius:13px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+}
+
+.support b{
+ font-size:11px;
+}
+
+.support span{
+ display:block;
+ color:var(--muted);
+ font-size:9px;
+ margin-top:4px;
+}
+
+.overlay{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,.78);
+ backdrop-filter:blur(8px);
+ z-index:100;
+ display:none;
+ align-items:flex-end;
+ justify-content:center;
+}
+
+.overlay.show{
+ display:flex;
+}
+
+.sheet{
+ width:100%;
+ max-width:520px;
+ max-height:93dvh;
+ overflow-y:auto;
+ background:
+  radial-gradient(circle at 50% 0%,rgba(32,209,155,.045),transparent 25%),
+  #11171d;
+ border:1px solid #2d3941;
+ border-bottom:0;
+ border-radius:25px 25px 0 0;
+ padding:22px 18px 32px;
+ animation:sheet .34s cubic-bezier(.2,.8,.2,1);
+ box-shadow:0 -20px 60px rgba(0,0,0,.45);
+}
+
+@keyframes sheet{
+ from{transform:translateY(100%)}
+ to{transform:translateY(0)}
+}
+
+.sheet-head{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ margin-bottom:18px;
+}
+
+.sheet h2{
+ font-size:18px;
+ margin:0;
+ font-weight:900;
+}
+
+.sheet p{
+ font-size:10px;
+ color:var(--muted);
+ margin:5px 0 0;
+}
+
+.close{
+ width:36px;
+ height:36px;
+ border-radius:50%;
+ background:#0c1115;
+ border:1px solid var(--line);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ font-size:20px;
+}
+
+.option-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:9px;
+}
+
+.option{
+ border:1px solid var(--line);
+ background:#0d1318;
+ border-radius:14px;
+ padding:13px;
+ text-align:left;
+ cursor:pointer;
+}
+
+.option.active{
+ border-color:#398b74;
+ background:#101c19;
+}
+
+.option b{
+ font-size:11px;
+}
+
+.option span{
+ display:block;
+ color:var(--muted);
+ font-size:9px;
+ margin-top:4px;
+}
+
+.toast{
+ position:fixed;
+ z-index:500;
+ left:11px;
+ right:11px;
+ top:11px;
+ max-width:498px;
+ margin:auto;
+ background:
+  radial-gradient(circle at 0 0,rgba(32,209,155,.08),transparent 30%),
+  #121a20;
+ border:1px solid #3a4a52;
+ border-radius:19px;
+ padding:14px;
+ transform:translateY(-150%);
+ opacity:0;
+ transition:.42s cubic-bezier(.2,.8,.2,1);
+ box-shadow:0 18px 45px rgba(0,0,0,.45);
+}
+
+.toast.show{
+ transform:translateY(0);
+ opacity:1;
+}
+
+.toast-content{
+ display:flex;
+ gap:12px;
+ align-items:center;
+}
+
+.toast-icon{
+ width:43px;
+ height:43px;
+ border-radius:14px;
+ background:#102820;
+ border:1px solid #245c4b;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+}
+
+.toast-main{
+ flex:1;
+ min-width:0;
+}
+
+.toast-top{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:8px;
+}
+
+.toast-title{
+ font-size:11px;
+ font-weight:900;
+}
+
+.toast-time{
+ font-size:8px;
+ color:#75818a;
+}
+
+.toast-message{
+ font-size:9px;
+ color:#a1abb2;
+ margin:4px 0 0;
+ line-height:1.4;
+}
+
+.toast-close{
+ width:28px;
+ height:28px;
+ border-radius:9px;
+ background:#0b1116;
+ border:1px solid #263139;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ font-size:14px;
+}
+
+.notification-item{
+ background:linear-gradient(145deg,#111820,#0d1318);
+ border:1px solid var(--line);
+ border-radius:17px;
+ padding:14px;
+ display:flex;
+ gap:11px;
+ align-items:center;
+}
+
+.notification-icon{
+ width:42px;
+ height:42px;
+ border-radius:13px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+}
+
+.notification-main{
+ flex:1;
+ min-width:0;
+}
+
+.notification-main b{
+ font-size:11px;
+ display:block;
+}
+
+.notification-main span{
+ display:block;
+ color:var(--muted);
+ font-size:9px;
+ margin-top:4px;
+ line-height:1.4;
+}
+
+.notification-amount{
+ font-size:11px;
+ font-weight:900;
+ text-align:right;
+}
+
+.notification-amount small{
+ display:block;
+ color:#ef6672;
+ font-size:8px;
+ margin-top:3px;
+}
+
+.notification-remove{
+ width:30px;
+ height:30px;
+ border-radius:9px;
+ border:1px solid #303a42;
+ background:#0b1015;
+ cursor:pointer;
+ color:#8c979f;
+}
+
+.notification-banner{
+ margin:0 17px 12px;
+ padding:13px;
+ border-radius:16px;
+ background:#11191f;
+ border:1px solid #29363e;
+ display:flex;
+ align-items:center;
+ gap:10px;
+}
+
+.notification-banner-icon{
+ width:39px;
+ height:39px;
+ border-radius:12px;
+ background:#102820;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+}
+
+.empty{
+ padding:38px 15px;
+ text-align:center;
+ color:#727d86;
+ font-size:10px;
+ border:1px solid #252d34;
+ border-radius:16px;
+ background:#10151b;
+}
+
+.proof{
+ margin-top:15px;
+ padding:15px;
+ border:1px dashed #42515a;
+ border-radius:16px;
+ background:#0a1015;
+}
+
+.proof-title{
+ font-size:10px;
+ font-weight:850;
+ margin-bottom:8px;
+}
+
+.proof-file{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ padding:10px;
+ background:#10171d;
+ border:1px solid #28343c;
+ border-radius:12px;
+}
+
+.proof-file span{
+ font-size:9px;
+ color:#a2adb5;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+}
+
+.proof-file b{
+ font-size:8px;
+ color:#69dfbd;
+}
+
+.scroll-hint{
+ text-align:center;
+ color:#5e6a73;
+ font-size:8px;
+ margin:2px 0 13px;
+}
+
+.timeline{
+ display:flex;
+ flex-direction:column;
+ gap:0;
+}
+
+.timeline-item{
+ position:relative;
+ padding:0 0 15px 30px;
+}
+
+.timeline-item:before{
+ content:"";
+ position:absolute;
+ left:8px;
+ top:5px;
+ bottom:-2px;
+ width:1px;
+ background:#28333b;
+}
+
+.timeline-item:last-child:before{
+ display:none;
+}
+
+.timeline-dot{
+ position:absolute;
+ left:3px;
+ top:1px;
+ width:11px;
+ height:11px;
+ border-radius:50%;
+ background:var(--green);
+ box-shadow:0 0 10px rgba(32,209,155,.25);
+}
+
+.timeline-card{
+ background:#0d1419;
+ border:1px solid #27333b;
+ border-radius:14px;
+ padding:11px;
+}
+
+.timeline-card b{
+ font-size:10px;
+}
+
+.timeline-card span{
+ display:block;
+ font-size:8px;
+ color:var(--muted);
+ margin-top:4px;
+ line-height:1.5;
+}
+
+@media(max-width:360px){
+ .balance{font-size:39px}
+ .card-number{
+  font-size:17px;
+  letter-spacing:2.5px;
+ }
+ .card{
+  padding:20px;
+ }
+ .actions{
+  grid-template-columns:1fr;
+ }
+ .info-grid{
+  grid-template-columns:1fr;
+ }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="pages">
+
+<section id="page-home" class="page active">
+
+<div class="top">
+
+ <div class="brand">
+
+  <div class="brand-icon">
+   <svg viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="1.8">
+    <rect x="3" y="5" width="18" height="14" rx="3"/>
+    <path d="M3 10h18"/>
+    <path d="M7 15h4"/>
+   </svg>
+  </div>
+
+  <div>
+   <div class="top-title">CardMZ</div>
+   <div class="top-sub">Carteira digital de demonstração</div>
+  </div>
+
+ </div>
+
+ <div class="status">
+  <i class="status-dot"></i>
+  Ativa
+ </div>
+
+</div>
+
+<div class="balance-box">
+
+ <span class="label">Saldo disponível</span>
+
+ <div id="home-balance" class="balance">$0.00</div>
+
+ <div id="home-conversion" class="balance-conversion">
+  Literal: $0.00
+ </div>
+
+ <div id="home-mzn" class="mzn">
+  ~ 0 MZN
+ </div>
+
+ <div class="balance-meta">
+
+  <div class="mini">
+   <span>Saldo reservado</span>
+   <b>$0.00</b>
+  </div>
+
+  <div class="mini">
+   <span>Limite disponível</span>
+   <b>$1,000.00</b>
+  </div>
+
+ </div>
+
+</div>
+
+<div class="section">
+ <div id="home-card"></div>
+</div>
+
+<div class="section">
+
+ <div class="section-head">
+  <div class="section-title">Acesso rápido</div>
+ </div>
+
+ <div class="actions">
+
+  <button class="action" onclick="openDeposit()">
+
+   <div class="action-icon" style="background:#10251f">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="2">
+     <path d="M12 5v14M5 12h14"/>
+    </svg>
+   </div>
+
+   <span>Adicionar valor</span>
+
+  </button>
+
+  <button class="action" onclick="goToPage('withdraw')">
+
+   <div class="action-icon" style="background:#211d12">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#dcb55f" stroke-width="2">
+     <path d="M5 12h14"/>
+     <path d="M13 6l6 6-6 6"/>
+    </svg>
+   </div>
+
+   <span>Levantamento</span>
+
+  </button>
+
+  <button class="action" onclick="goToPage('cards')">
+
+   <div class="action-icon" style="background:#111d2d">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#5b9cff" stroke-width="1.8">
+     <rect x="2.5" y="4" width="19" height="16" rx="3"/>
+     <path d="M2.5 9h19"/>
+     <path d="M7 14h4"/>
+     <path d="M7 17h7"/>
+    </svg>
+   </div>
+
+   <span>Meus cartões</span>
+
+  </button>
+
+  <button class="action" onclick="goToPage('informacoes')">
+
+   <div class="action-icon" style="background:#19162a">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#aa91f5" stroke-width="1.8">
+     <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+     <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+    </svg>
+   </div>
+
+   <span>Notificações</span>
+
+  </button>
+
+ </div>
+
+</div>
+
+<div class="section">
+
+ <div class="section-head">
+  <div class="section-title">Resumo da conta</div>
+  <button class="link" onclick="goToPage('account')">Detalhes</button>
+ </div>
+
+ <div class="info-grid">
+
+  <div class="info-card">
+   <b>Moeda principal</b>
+   <span>USD · equivalente apresentado em MZN</span>
+  </div>
+
+  <div class="info-card">
+   <b>Movimentos</b>
+   <span id="movement-count">0 transações registadas</span>
+  </div>
+
+  <div class="info-card">
+   <b>Segurança</b>
+   <span>Proteção local disponível</span>
+  </div>
+
+  <div class="info-card">
+   <b>Status</b>
+   <span>Conta em modo de demonstração</span>
+  </div>
+
+ </div>
+
+</div>
+
+<div class="section">
+
+ <div class="section-head">
+  <div class="section-title">Atividade recente</div>
+  <button class="link" onclick="goToPage('history')">Ver tudo</button>
+ </div>
+
+ <div id="home-history" style="display:flex;flex-direction:column;gap:8px"></div>
+
+</div>
+
+<div class="section">
+
+ <div style="padding:14px;border:1px solid #282f35;border-radius:15px;background:#0d1217">
+
+  <b style="font-size:10px">
+   Ambiente de demonstração
+  </b>
+
+  <p style="font-size:9px;color:#727d86;line-height:1.5;margin:4px 0 0">
+   Valores, cartões, levantamentos, notificações e comprovativos apresentados nesta interface são dados locais de demonstração.
+  </p>
+
+ </div>
+
+</div>
+
+</section>
+
+
+<section id="page-cards" class="page">
+
+<div class="page-head">
+ <h1>Meus Cartões</h1>
+ <p>Selecione e gerencie os cartões visuais da demonstração.</p>
+</div>
+
+<div id="selected-card-box"></div>
+
+<div class="scroll-hint">
+ Deslize horizontalmente para visualizar outros cartões
+</div>
+
+<div id="cards-list" class="card-slider"></div>
+
+<button class="add-card-btn" onclick="openCardModal()">
+
+ <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="2.2">
+  <path d="M12 5v14M5 12h14"/>
+ </svg>
+
+ Adicionar novo cartão
+
+</button>
+
+<div class="section">
+
+ <div class="section-title" style="margin-bottom:10px">
+  Segurança do cartão
+ </div>
+
+ <div class="account-card">
+
+  <div class="account-row">
+   <span>Bloqueio temporário</span>
+   <b style="color:#20d19b">Disponível</b>
+  </div>
+
+  <div class="account-row">
+   <span>Dados sensíveis</span>
+   <b>Protegidos</b>
+  </div>
+
+  <div class="account-row">
+   <span>Limite diário</span>
+   <b>$1,000.00</b>
+  </div>
+
+  <div class="account-row">
+   <span>Compras online</span>
+   <b style="color:#20d19b">Ativas</b>
+  </div>
+
+ </div>
+
+</div>
+
+</section>
+
+
+<section id="page-withdraw" class="page">
+
+<div class="page-head">
+ <h1>Levantamento</h1>
+ <p>Fluxo visual estruturado para simulação local.</p>
+</div>
+
+<div class="withdraw-wrap">
+
+<div class="stepbar">
+ <div id="s1" class="step active"></div>
+ <div id="s2" class="step"></div>
+ <div id="s3" class="step"></div>
+ <div id="s4" class="step"></div>
+ <div id="s5" class="step"></div>
+ <div id="s6" class="step"></div>
+</div>
+
+<div class="withdraw-panel">
+
+<div id="w1" class="withdraw-step active">
+
+<div class="label">Etapa 1 de 6</div>
+
+<h2 style="font-size:19px;margin:7px 0">
+ Escolha o método
+</h2>
+
+<p style="font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:17px">
+ Selecione o destino utilizado nesta demonstração.
+</p>
+
+<button class="method active" onclick="selectMethod('mpesa')" id="method-mpesa">
+
+ <div class="method-icon" style="background:#102a21">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#20d19b" stroke-width="1.7">
+   <rect x="6" y="2.8" width="12" height="18.4" rx="2.5"/>
+   <path d="M9 6.5h6"/>
+   <path d="M9 17.2h6"/>
+   <circle cx="12" cy="19" r=".7" fill="#20d19b" stroke="none"/>
+  </svg>
+ </div>
+
+ <div>
+  <b>M-Pesa</b>
+  <span>Destino por número de carteira</span>
+ </div>
+
+ <div class="check" id="check-mpesa">✓</div>
+
+</button>
+
+<button class="method" onclick="selectMethod('emola')" id="method-emola">
+
+ <div class="method-icon" style="background:#172a1d">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#72d996" stroke-width="1.7">
+   <circle cx="12" cy="12" r="9"/>
+   <path d="M8 8.5h8M8 12h6M8 15.5h8"/>
+   <path d="M15 8.5v7"/>
+  </svg>
+ </div>
+
+ <div>
+  <b>e-Mola</b>
+  <span>Destino por número de carteira</span>
+ </div>
+
+ <div class="check" id="check-emola"></div>
+
+</button>
+
+<button class="method" onclick="selectMethod('paypal')" id="method-paypal">
+
+ <div class="method-icon" style="background:#101e34">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#62a2ff" stroke-width="1.7">
+   <path d="M7 20l2.1-14h7.1a4.1 4.1 0 0 1 0 8.2h-6"/>
+   <path d="M9.1 17.2h4.8"/>
+  </svg>
+ </div>
+
+ <div>
+  <b>PayPal</b>
+  <span>Conta ou endereço de e-mail</span>
+ </div>
+
+ <div class="check" id="check-paypal"></div>
+
+</button>
+
+<button class="method" onclick="selectMethod('bim')" id="method-bim">
+
+ <div class="method-icon" style="background:#292115">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#e0bd6b" stroke-width="1.7">
+   <path d="M3 9.5L12 4l9 5.5"/>
+   <path d="M5 10v9M9.5 10v9M14.5 10v9M19 10v9"/>
+   <path d="M3 20h18"/>
+  </svg>
+ </div>
+
+ <div>
+  <b>Millennium BIM</b>
+  <span>Destino bancário</span>
+ </div>
+
+ <div class="check" id="check-bim"></div>
+
+</button>
+
+<button class="primary" onclick="withdrawNext(2)">
+ Continuar
+</button>
+
+</div>
+
+
+<div id="w2" class="withdraw-step">
+
+<div class="label">Etapa 2 de 6</div>
+
+<h2 style="font-size:19px;margin:7px 0">
+ Selecionar cartão
+</h2>
+
+<p style="font-size:10px;color:var(--muted);line-height:1.6">
+ Escolha o cartão visual associado ao levantamento.
+</p>
+
+<div id="withdraw-card-selection"
+     style="display:flex;flex-direction:column;gap:9px;margin-top:15px">
+</div>
+
+<button class="primary" onclick="withdrawNext(3)">
+ Continuar
+</button>
+
+<button class="secondary" onclick="withdrawNext(1)">
+ Voltar
+</button>
+
+</div>
+
+
+<div id="w3" class="withdraw-step">
+
+<div class="label">Etapa 3 de 6</div>
+
+<h2 style="font-size:19px;margin:7px 0">
+ Defina o valor
+</h2>
+
+<div class="balance-box" style="margin:14px 0;padding:16px">
+
+ <span class="label">
+  Saldo disponível
+ </span>
+
+ <b id="withdraw-balance"
+    style="display:block;font-size:26px;margin-top:4px">
+  $0.00
+ </b>
+
+ <div id="withdraw-literal"
+      style="color:#ef6672;font-size:9px;margin-top:4px">
+  Literal: $0.00
+ </div>
+
+ <span style="display:block;font-size:9px;color:var(--muted);margin-top:4px">
+  Valor disponível apenas para esta demonstração local.
+ </span>
+
+</div>
+
+<label class="field-label">
+ Moeda
+</label>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+
+ <button id="cur-usd"
+         class="method active"
+         onclick="setCurrency('USD')"
+         style="margin:0;justify-content:center">
+  <b>USD</b>
+ </button>
+
+ <button id="cur-mzn"
+         class="method"
+         onclick="setCurrency('MZN')"
+         style="margin:0;justify-content:center">
+  <b>MZN</b>
+ </button>
+
+</div>
+
+<label class="field-label">
+ Valor do levantamento
+</label>
+
+<input id="withdraw-amount"
+       class="field amount-input"
+       type="number"
+       min="0"
+       step=".01"
+       placeholder="0.00"
+       oninput="updateWithdrawPreview()"/>
+
+<div class="amount-preview">
+
+ <div class="literal" id="withdraw-literal-preview">
+  Literal: 0.00 USD
+ </div>
+
+ <div class="converted" id="withdraw-converted-preview">
+  Conversão: 0 MZN
+ </div>
+
+</div>
+
+<div class="summary">
+
+ <div class="summary-row">
+  <span>Valor solicitado</span>
+  <b id="sum-amount">$0.00</b>
+ </div>
+
+ <div class="summary-row">
+  <span>Taxa demonstrativa</span>
+  <b>$0.00</b>
+ </div>
+
+ <div class="summary-row">
+  <span>Equivalente</span>
+  <b id="sum-equivalent">0 MZN</b>
+ </div>
+
+ <div class="summary-row">
+  <span>Saldo após operação</span>
+  <b id="sum-after">$0.00</b>
+ </div>
+
+</div>
+
+<button class="primary"
+        id="amount-next"
+        disabled
+        onclick="withdrawNext(4)">
+ Continuar
+</button>
+
+<button class="secondary" onclick="withdrawNext(2)">
+ Voltar
+</button>
+
+</div>
+
+
+<div id="w4" class="withdraw-step">
+
+<div class="label">Etapa 4 de 6</div>
+
+<h2 style="font-size:19px;margin:7px 0">
+ Dados do destino
+</h2>
+
+<p style="font-size:10px;color:var(--muted);line-height:1.6">
+ Introduza os dados necessários para identificar o destino da demonstração.
+</p>
+
+<label id="destination-label"
+       class="field-label">
+ Número M-Pesa
+</label>
+
+<input id="destination"
+       class="field"
+       type="text"
+       placeholder="Ex.: 84 000 0000"/>
+
+<label class="field-label">
+ Nome do destinatário
+</label>
+
+<input id="destination-name"
+       class="field"
+       type="text"
+       placeholder="Nome para identificação"/>
+
+<label class="field-label">
+ Observação
+</label>
+
+<input id="destination-note"
+       class="field"
+       type="text"
+       placeholder="Opcional"/>
+
+<div class="summary">
+
+ <div class="summary-row">
+  <span>Método</span>
+  <b id="review-method">M-Pesa</b>
+ </div>
+
+ <div class="summary-row">
+  <span>Cartão</span>
+  <b id="review-card">Não selecionado</b>
+ </div>
+
+ <div class="summary-row">
+  <span>Valor</span>
+  <b id="review-amount">$0.00</b>
+ </div>
+
+ <div class="summary-row">
+  <span>Destino</span>
+  <b id="review-destination">Não informado</b>
+ </div>
+
+</div>
+
+<div class="proof">
+
+ <div class="proof-title">
+  Comprovativo / referência visual
+ </div>
+
+ <div class="proof-file">
+  <span id="proof-name">
+   Nenhum comprovativo anexado
+  </span>
+  <b>LOCAL</b>
+ </div>
+
+ <input id="proof-input"
+        type="file"
+        accept="image/*"
+        style="display:none"
+        onchange="handleProof(this)"/>
+
+ <button class="secondary"
+         onclick="document.getElementById('proof-input').click()">
+  Selecionar imagem
+ </button>
+
+</div>
+
+<button class="primary" onclick="validateDestination()">
+ Continuar
+</button>
+
+<button class="secondary" onclick="withdrawNext(3)">
+ Voltar
+</button>
+
+</div>
+
+
+<div id="w5" class="withdraw-step">
+
+<div class="label">Etapa 5 de 6</div>
+
+<h2 style="font-size:19px;margin:7px 0">
+ Revisar operação
+</h2>
+
+<div class="receipt" style="margin-top:14px">
+
+ <div class="demo">
+  SIMULAÇÃO — SEM VALOR FINANCEIRO
+ </div>
+
+ <div class="receipt-title">
+  Revisão da operação
+ </div>
+
+ <div class="receipt-sub">
+  Confira todos os dados antes de iniciar o processamento visual.
+ </div>
+
+ <div class="receipt-row">
+  <span>Método</span>
+  <b id="confirm-method">M-Pesa</b>
+ </div>
+
+ <div class="receipt-row">
+  <span>Cartão</span>
+  <b id="confirm-card">—</b>
+ </div>
+
+ <div class="receipt-row">
+  <span>Valor solicitado</span>
+  <b id="confirm-amount">$0.00</b>
+ </div>
+
+ <div class="receipt-row">
+  <span>Conversão</span>
+  <b id="confirm-conversion">0 MZN</b>
+ </div>
+
+ <div class="receipt-row">
+  <span>Destinatário</span>
+  <b id="confirm-name">—</b>
+ </div>
+
+ <div class="receipt-row">
+  <span>Destino</span>
+  <b id="confirm-destination">—</b>
+ </div>
+
+ <div class="receipt-row">
+  <span>Comprovativo</span>
+  <b id="confirm-proof">Não anexado</b>
+ </div>
+
+ <div class="receipt-row">
+  <span>Taxa demonstrativa</span>
+  <b>$0.00</b>
+ </div>
+
+</div>
+
+<button class="primary"
+        onclick="startWithdrawProcessing()">
+ Confirmar e processar
+</button>
+
+<button class="secondary"
+        onclick="withdrawNext(4)">
+ Voltar e editar
+</button>
+
+</div>
+
+
+<div id="w6" class="withdraw-step">
+
+<div class="processing">
+
+ <div class="demo">
+  PROCESSAMENTO DE DEMONSTRAÇÃO
+ </div>
+
+ <div class="processing-icon">
+
+  <svg width="35"
+       height="35"
+       viewBox="0 0 24 24"
+       fill="none"
+       stroke="#20d19b"
+       stroke-width="1.5">
+   <path d="M12 6v6l4 2"/>
+   <circle cx="12" cy="12" r="8"/>
+  </svg>
+
+ </div>
+
+ <h2 id="processing-title">
+  Preparando operação
+ </h2>
+
+ <p id="processing-text">
+  A demonstração está a preparar o próximo estágio.
+ </p>
+
+ <div id="processing-seconds"
+      class="processing-number">
+  30
+ </div>
+
+ <div class="processing-unit">
+  SEGUNDOS
+ </div>
+
+ <div class="progress">
+  <div id="progress-bar"
+       class="progress-bar">
+  </div>
+ </div>
+
+ <div style="display:flex;justify-content:space-between;font-size:8px;color:#69747d">
+  <span>Início</span>
+  <span id="progress-percent">0%</span>
+  <span>Final</span>
+ </div>
+
+ <div class="processing-log">
+
+  <div id="log1" class="log">
+   <i class="log-dot"></i>
+   Validando dados da demonstração
+  </div>
+
+  <div id="log2" class="log">
+   <i class="log-dot"></i>
+   Conferindo cartão selecionado
+  </div>
+
+  <div id="log3" class="log">
+   <i class="log-dot"></i>
+   Preparando dados do destino
+  </div>
+
+  <div id="log4" class="log">
+   <i class="log-dot"></i>
+   Processando operação visual
+  </div>
+
+  <div id="log5" class="log">
+   <i class="log-dot"></i>
+   Finalizando demonstração
+  </div>
+
+ </div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</section>
+
+
+<section id="page-informacoes" class="page">
+
+<div class="page-head">
+ <h1>Informações</h1>
+ <p>Central de notificações e atividade da demonstração.</p>
+</div>
+
+<div id="notification-banner"
+     class="notification-banner"
+     style="display:none">
+
+ <div class="notification-banner-icon">
+  <svg width="19" height="19"
+       viewBox="0 0 24 24"
+       fill="none"
+       stroke="#20d19b"
+       stroke-width="2">
+   <path d="M20 6L9 17l-5-5"/>
+  </svg>
+ </div>
+
+ <div>
+  <b id="banner-title" style="font-size:10px">
+   Nova atividade
+  </b>
+
+  <div id="banner-text"
+       style="font-size:8px;color:#7e8a95;margin-top:3px">
+   —
+  </div>
+ </div>
+
+</div>
+
+<div class="account-card">
+
+ <div class="account-row">
+  <span>Notificações pendentes</span>
+  <b id="pending-count">0</b>
+ </div>
+
+ <div class="account-row">
+  <span>Notificações entregues</span>
+  <b id="delivered-count">0</b>
+ </div>
+
+ <div class="account-row">
+  <span>Estado</span>
+  <b style="color:#20d19b">Ativo</b>
+ </div>
+
+</div>
+
+<div class="section">
+
+ <button class="primary"
+         onclick="openNotification()">
+  Agendar notificação
+ </button>
+
+</div>
+
+<div class="section">
+
+ <div class="section-head">
+  <div class="section-title">
+   Notificações
+  </div>
+ </div>
+
+ <div id="notification-list"
+      style="display:flex;flex-direction:column;gap:8px">
+ </div>
+
+</div>
+
+<div class="section">
+
+ <div class="section-title"
+      style="margin-bottom:9px">
+  Linha de atividade
+ </div>
+
+ <div id="notification-timeline"
+      class="timeline">
+ </div>
+
+</div>
+
+<div class="section">
+
+ <div class="section-title"
+      style="margin-bottom:9px">
+  Central de SAC
+ </div>
+
+ <button class="support-card"
+         style="width:100%;text-align:left;cursor:pointer"
+         onclick="goToPage('sac')">
+
+  <div class="support">
+
+   <div class="support-icon"
+        style="background:#10231d">
+
+    <svg width="20"
+         height="20"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="#20d19b"
+         stroke-width="1.8">
+     <path d="M4 5h16v11H7l-3 3z"/>
+     <path d="M8 9h8M8 12h5"/>
+    </svg>
+
+   </div>
+
+   <div>
+    <b>Suporte e atendimento</b>
+    <span>Consulte os canais disponíveis</span>
+   </div>
+
+  </div>
+
+ </button>
+
+</div>
+
+</section>
+
+
+<section id="page-history" class="page">
+
+<div class="page-head">
+ <h1>Histórico</h1>
+ <p>Todas as movimentações locais da demonstração.</p>
+</div>
+
+<div class="section">
+
+ <div class="info-grid">
+
+  <div class="info-card">
+   <span>Entradas</span>
+   <b id="hist-in">$0.00</b>
+  </div>
+
+  <div class="info-card">
+   <span>Saídas</span>
+   <b id="hist-out">$0.00</b>
+  </div>
+
+ </div>
+
+</div>
+
+<div class="section">
+
+ <input id="history-search"
+        class="field"
+        placeholder="Pesquisar atividade..."
+        oninput="renderHistory()"/>
+
+</div>
+
+<div class="section">
+
+ <div id="history-list"
+      style="display:flex;flex-direction:column;gap:8px">
+ </div>
+
+</div>
+
+</section>
+
+
+<section id="page-account" class="page">
+
+<div class="page-head">
+ <h1>Minha Conta</h1>
+ <p>Informações e configurações da conta.</p>
+</div>
+
+<div class="account-card">
+
+ <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px">
+
+  <div style="width:51px;height:51px;border-radius:16px;background:#16241f;display:flex;align-items:center;justify-content:center">
+
+   <svg width="25"
+        height="25"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#20d19b"
+        stroke-width="1.7">
+    <circle cx="12" cy="8" r="3"/>
+    <path d="M5 21a7 7 0 0 1 14 0"/>
+   </svg>
+
+  </div>
+
+  <div>
+   <b style="font-size:14px">
+    Arsénio Tomas Banta
+   </b>
+
+   <span style="display:block;color:#707b84;font-size:9px;margin-top:3px">
+    Titular da conta
+   </span>
+  </div>
+
+ </div>
+
+ <div class="account-row">
+  <span>Estado</span>
+  <b style="color:#20d19b">Ativa</b>
+ </div>
+
+ <div class="account-row">
+  <span>Moeda principal</span>
+  <b>USD</b>
+ </div>
+
+ <div class="account-row">
+  <span>Conta</span>
+  <b>CardMZ Virtual</b>
+ </div>
+
+ <div class="account-row">
+  <span>Modo</span>
+  <b>Demonstração</b>
+ </div>
+
+</div>
+
+<div class="section">
+
+ <div class="section-title"
+      style="margin-bottom:9px">
+  Segurança
+ </div>
+
+ <div class="account-card">
+
+  <div class="account-row">
+   <span>Proteção do cartão</span>
+   <b style="color:#20d19b">Ativa</b>
+  </div>
+
+  <div class="account-row">
+   <span>Dados sensíveis</span>
+   <b>Protegidos</b>
+  </div>
+
+  <div class="account-row">
+   <span>Bloqueio</span>
+   <b>Disponível</b>
+  </div>
+
+  <div class="account-row">
+   <span>Última atividade</span>
+   <b id="last-activity">Agora</b>
+  </div>
+
+ </div>
+
+</div>
+
+</section>
+
+
+<section id="page-sac" class="page">
+
+<div class="page-head">
+ <h1>SAC</h1>
+ <p>Central de suporte CardMZ.</p>
+</div>
+
+<div class="support-card">
+
+ <div class="support">
+
+  <div class="support-icon"
+       style="background:#10231d">
+   <svg width="21"
+        height="21"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#20d19b"
+        stroke-width="1.8">
+    <path d="M4 5h16v11H7l-3 3z"/>
+    <path d="M8 9h8M8 12h5"/>
+   </svg>
+  </div>
+
+  <div>
+   <b>Atendimento CardMZ</b>
+   <span>Central de suporte da demonstração</span>
+  </div>
+
+ </div>
+
+ <div class="support">
+
+  <div class="support-icon"
+       style="background:#14261a">
+   <svg width="21"
+        height="21"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#72d996"
+        stroke-width="1.8">
+    <circle cx="12" cy="12" r="8.5"/>
+    <path d="M8 8.5h8M8 12h6M8 15.5h8"/>
+    <path d="M15 8.5v7"/>
+   </svg>
+  </div>
+
+  <div>
+   <b>e-Mola</b>
+   <span>Método apresentado no fluxo de demonstração</span>
+  </div>
+
+ </div>
+
+ <div class="support">
+
+  <div class="support-icon"
+       style="background:#101d31">
+   <svg width="21"
+        height="21"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#5b9cff"
+        stroke-width="1.8">
+    <path d="M7 20l2-14h7a4 4 0 0 1 0 8H10"/>
+    <path d="M10 14h5"/>
+   </svg>
+  </div>
+
+  <div>
+   <b>PayPal</b>
+   <span>Método apresentado no fluxo de demonstração</span>
+  </div>
+
+ </div>
+
+ <div class="support">
+
+  <div class="support-icon"
+       style="background:#292115">
+   <svg width="21"
+        height="21"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#dcb55f"
+        stroke-width="1.8">
+    <path d="M3 10l9-6 9 6"/>
+    <path d="M5 10v9M10 10v9M14 10v9M19 10v9M3 20h18"/>
+   </svg>
+  </div>
+
+  <div>
+   <b>Millennium BIM</b>
+   <span>Método apresentado no fluxo de demonstração</span>
+  </div>
+
+ </div>
+
+</div>
+
+<div class="section">
+
+ <div class="section-title"
+      style="margin-bottom:9px">
+  Perguntas frequentes
+ </div>
+
+ <div class="account-card">
+
+  <div class="account-row">
+   <span>Como funciona o cartão?</span>
+   <b>Ver detalhes</b>
+  </div>
+
+  <div class="account-row">
+   <span>Como funciona o levantamento?</span>
+   <b>Ver detalhes</b>
+  </div>
+
+  <div class="account-row">
+   <span>Onde encontro o histórico?</span>
+   <b>Histórico</b>
+  </div>
+
+  <div class="account-row">
+   <span>Como adicionar um cartão?</span>
+   <b>Cartões</b>
+  </div>
+
+ </div>
+
+</div>
+
+<div class="section">
+
+ <div style="padding:14px;background:#201c12;border:1px solid #4b4026;border-radius:14px">
+
+  <b style="font-size:10px;color:#dfc477">
+   Aviso
+  </b>
+
+  <p style="font-size:9px;color:#8d8061;line-height:1.6;margin:5px 0 0">
+   Esta interface é uma demonstração local. Os métodos, valores e operações apresentados não significam integração bancária ou transferência financeira real.
+  </p>
+
+ </div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<nav class="nav">
+
+<button id="nav-home"
+        class="active"
+        onclick="goToPage('home')">
+
+ <svg viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8">
+  <path d="M3 10.5L12 3l9 7.5"/>
+  <path d="M5 9.5V21h14V9.5"/>
+  <path d="M9 21v-7h6v7"/>
+ </svg>
+
+ Início
+
+</button>
+
+<button id="nav-cards"
+        onclick="goToPage('cards')">
+
+ <svg viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8">
+  <rect x="2" y="5" width="20" height="14" rx="2.5"/>
+  <path d="M2 10h20"/>
+ </svg>
+
+ Cartões
+
+</button>
+
+<button id="nav-informacoes"
+        onclick="goToPage('informacoes')">
+
+ <svg viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8">
+  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+  <path d="M13.7 21a2 2 0 0 1-3.4 0"/>
+ </svg>
+
+ Informações
+
+ <span id="nav-badge"
+       class="badge">
+  0
+ </span>
+
+</button>
+
+<button id="nav-history"
+        onclick="goToPage('history')">
+
+ <svg viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8">
+  <path d="M3 12a9 9 0 1 0 3-6.7"/>
+  <polyline points="3 4 3 10 9 10"/>
+  <polyline points="12 7 12 12 15 14"/>
+ </svg>
+
+ Histórico
+
+</button>
+
+</nav>
+
+
+<div id="deposit-modal"
+     class="overlay">
+
+<div class="sheet">
+
+<div class="sheet-head">
+
+ <div>
+  <h2>Adicionar valor</h2>
+  <p>Registo local de entrada</p>
+ </div>
+
+ <button class="close"
+         onclick="closeOverlay('deposit-modal')">
+  ×
+ </button>
+
+</div>
+
+<div class="demo">
+ SIMULAÇÃO LOCAL
+</div>
+
+<label class="field-label">
+ Moeda
+</label>
+
+<div class="option-grid">
+
+ <button id="dep-usd"
+         class="option active"
+         onclick="depCurrency='USD';setDepButtons()">
+
+  <b>USD</b>
+  <span>Dólar americano</span>
+
+ </button>
+
+ <button id="dep-mzn"
+         class="option"
+         onclick="depCurrency='MZN';setDepButtons()">
+
+  <b>MZN</b>
+  <span>Metical</span>
+
+ </button>
+
+</div>
+
+<label class="field-label">
+ Valor
+</label>
+
+<input id="dep-amount"
+       class="field amount-input"
+       type="number"
+       placeholder="0.00"/>
+
+<div id="dep-preview"
+     class="amount-preview"
+     style="display:none">
+
+ <div id="dep-literal"
+      class="literal">
+  Literal: 0.00 USD
+ </div>
+
+ <div id="dep-converted"
+      class="converted">
+  Conversão: 0 MZN
+ </div>
+
+</div>
+
+<label class="field-label">
+ Origem
+</label>
+
+<select id="dep-origin"
+        class="field">
+
+ <option value="">
+  Selecionar origem
+ </option>
+
+ <option>
+  PayPal
+ </option>
+
+ <option>
+  M-Pesa
+ </option>
+
+ <option>
+  e-Mola
+ </option>
+
+ <option>
+  Hotmart
+ </option>
+
+ <option>
+  Outro
+ </option>
+
+</select>
+
+<button class="primary"
+        onclick="deposit()">
+ Adicionar ao saldo
+</button>
+
+</div>
+</div>
+
+
+<div id="card-modal"
+     class="overlay">
+
+<div class="sheet">
+
+<div class="sheet-head">
+
+ <div>
+  <h2>Adicionar cartão</h2>
+  <p>Crie um cartão visual de demonstração</p>
+ </div>
+
+ <button class="close"
+         onclick="closeOverlay('card-modal')">
+  ×
+ </button>
+
+</div>
+
+<div class="demo">
+ CARTÃO DE DEMONSTRAÇÃO
+</div>
+
+<label class="field-label">
+ Nome do titular
+</label>
+
+<input id="new-card-name"
+       class="field"
+       placeholder="Nome completo"/>
+
+<label class="field-label">
+ Tipo
+</label>
+
+<select id="new-card-type"
+        class="field">
+ <option>Virtual</option>
+ <option>Virtual Premium</option>
+ <option>Físico</option>
+</select>
+
+<label class="field-label">
+ Moeda
+</label>
+
+<select id="new-card-currency"
+        class="field">
+ <option>USD</option>
+ <option>MZN</option>
+ <option>EUR</option>
+</select>
+
+<label class="field-label">
+ Limite mensal
+</label>
+
+<input id="new-card-limit"
+       class="field"
+       type="number"
+       placeholder="1000"/>
+
+<label class="field-label">
+ Validade
+</label>
+
+<input id="new-card-expiry"
+       class="field"
+       placeholder="12/30"/>
+
+<button class="primary"
+        onclick="addCard()">
+ Criar cartão
+</button>
+
+</div>
+</div>
+
+
+<div id="notif-modal"
+     class="overlay">
+
+<div class="sheet">
+
+<div class="sheet-head">
+
+ <div>
+  <h2>Nova notificação</h2>
+  <p>Agende uma notificação para aparecer posteriormente.</p>
+ </div>
+
+ <button class="close"
+         onclick="closeOverlay('notif-modal')">
+  ×
+ </button>
+
+</div>
+
+<label class="field-label">
+ Tipo
+</label>
+
+<select id="notif-type"
+        class="field">
+
+ <option value="income">
+  Entrada / recebimento
+ </option>
+
+ <option value="withdrawal">
+  Saída / levantamento
+ </option>
+
+</select>
+
+<label class="field-label">
+ Nome / origem / destino
+</label>
+
+<input id="notif-origin"
+       class="field"
+       placeholder="Ex.: João Silva"/>
+
+<label class="field-label">
+ Valor
+</label>
+
+<input id="notif-amount"
+       class="field amount-input"
+       type="number"
+       placeholder="0.00"/>
+
+<div class="amount-preview">
+
+ <div id="notif-literal"
+      class="literal">
+  Literal: 0.00 USD
+ </div>
+
+ <div id="notif-converted"
+      class="converted">
+  Conversão: 0 MZN
+ </div>
+
+</div>
+
+<label class="field-label">
+ Atraso da notificação
+</label>
+
+<select id="notif-delay"
+        class="field">
+
+ <option value="3">3 segundos</option>
+ <option value="5">5 segundos</option>
+ <option value="10">10 segundos</option>
+ <option value="15">15 segundos</option>
+ <option value="30">30 segundos</option>
+ <option value="60">1 minuto</option>
+ <option value="120">2 minutos</option>
+ <option value="300">5 minutos</option>
+ <option value="600">10 minutos</option>
+
+</select>
+
+<button class="primary"
+        onclick="createNotification()">
+ Agendar notificação
+</button>
+
+</div>
+</div>
+
+
+<div id="toast"
+     class="toast">
+
+<div class="toast-content">
+
+ <div class="toast-icon">
+
+  <svg width="20"
+       height="20"
+       viewBox="0 0 24 24"
+       fill="none"
+       stroke="#20d19b"
+       stroke-width="2">
+   <path d="M20 6L9 17l-5-5"/>
+  </svg>
+
+ </div>
+
+ <div class="toast-main">
+
+  <div class="toast-top">
+
+   <b id="toast-title"
+      class="toast-title">
+    Confirmado
+   </b>
+
+   <span id="toast-time"
+         class="toast-time">
+    agora
+   </span>
+
+  </div>
+
+  <p id="toast-message"
+     class="toast-message">
+  </p>
+
+ </div>
+
+ <button class="toast-close"
+         onclick="hideToast()">
+  ×
+ </button>
+
+</div>
+
+</div>
+
+
+<script>
+const EXCHANGE=63;
+
+const state={
+ balance:0,
+ currency:"USD",
+ method:"mpesa",
+ selectedCard:0,
+
+ cards:[
+  {
+   id:1,
+   name:"Arsénio Tomas Banta",
+   type:"Virtual Premium",
+   currency:"USD",
+   limit:"1000",
+   expiry:"02/30",
+   number:"4323 •••• •••• 3454"
+  }
+ ],
+
+ history:[],
+ notifications:[],
+ deliveredNotifications:[],
+ notificationTimeline:[],
+ notificationTimers:{}
+};
+
+let depCurrency="USD";
+let withdrawCurrency="USD";
+let processingTimer=null;
+let proofName="";
+
+const methods={
+ mpesa:"M-Pesa",
+ emola:"e-Mola",
+ paypal:"PayPal",
+ bim:"Millennium BIM"
+};
+
+function money(v){
+ return "$"+Number(v).toLocaleString("en-US",{
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
+ });
+}
+
+function mzn(v){
+ return Math.round(Number(v)*EXCHANGE).toLocaleString("pt-PT")+" MZN";
+}
+
+function escapeHTML(str){
+ return String(str)
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
+}
+
+function nowDate(){
+ return new Date().toLocaleString("pt-PT",{
+  day:"2-digit",
+  month:"2-digit",
+  year:"numeric",
+  hour:"2-digit",
+  minute:"2-digit"
+ });
+}
+
+function goToPage(name){
+
+ document.querySelectorAll(".page")
+  .forEach(x=>x.classList.remove("active"));
+
+ const page=document.getElementById("page-"+name);
+
+ if(page)page.classList.add("active");
+
+ document.querySelectorAll(".nav button")
+  .forEach(x=>x.classList.remove("active"));
+
+ const nav=document.getElementById("nav-"+name);
+
+ if(nav)nav.classList.add("active");
+
+ if(name==="home")renderHome();
+ if(name==="cards")renderCards();
+ if(name==="withdraw")renderWithdrawCardSelection();
+ if(name==="history")renderHistory();
+ if(name==="informacoes"){
+  renderNotifications();
+  updateBadge();
+ }
+}
+
+function updateBalance(){
+
+ const homeBalance=document.getElementById("home-balance");
+ const homeMzn=document.getElementById("home-mzn");
+ const homeConversion=document.getElementById("home-conversion");
+
+ if(homeBalance)
+  homeBalance.textContent=money(state.balance);
+
+ if(homeConversion)
+  homeConversion.textContent=
+   "Literal: "+money(state.balance);
+
+ if(homeMzn)
+  homeMzn.textContent=
+   "~ "+mzn(state.balance);
+
+ const wb=document.getElementById("withdraw-balance");
+
+ if(wb)
+  wb.textContent=money(state.balance);
+
+ const wl=document.getElementById("withdraw-literal");
+
+ if(wl)
+  wl.textContent="Literal: "+money(state.balance);
+
+ const mc=document.getElementById("movement-count");
+
+ if(mc)
+  mc.textContent=
+   state.history.length+
+   (state.history.length===1
+    ?" transação registada"
+    :" transações registadas");
+
+ const inTotal=state.history
+  .filter(x=>x.type==="income")
+  .reduce((a,x)=>a+x.usd,0);
+
+ const outTotal=state.history
+  .filter(x=>x.type==="withdrawal")
+  .reduce((a,x)=>a+x.usd,0);
+
+ const hi=document.getElementById("hist-in");
+ const ho=document.getElementById("hist-out");
+
+ if(hi)hi.textContent=money(inTotal);
+ if(ho)ho.textContent=money(outTotal);
+}
+
+function renderHome(){
+
+ updateBalance();
+
+ const selected=
+  state.cards[state.selectedCard]||state.cards[0];
+
+ const homeCard=
+  document.getElementById("home-card");
+
+ if(homeCard&&selected){
+
+  homeCard.innerHTML=`
+
+   <div class="card">
+
+    <div class="card-top">
+
+     <div class="card-brand">
+      CARDMZ ${escapeHTML(selected.type).toUpperCase()}
+     </div>
+
+     <div class="chip"></div>
+
+    </div>
+
+    <div class="card-number">
+     ${escapeHTML(selected.number)}
+    </div>
+
+    <div class="card-bottom">
+
+     <div>
+      <div class="card-caption">Titular</div>
+      <div class="card-value">
+       ${escapeHTML(selected.name).toUpperCase()}
+      </div>
+     </div>
+
+     <div>
+      <div class="card-caption">Validade</div>
+      <div class="card-value">
+       ${escapeHTML(selected.expiry)}
+      </div>
+     </div>
+
+     <div class="card-network">
+      ${escapeHTML(selected.currency)}
+     </div>
+
+    </div>
+
+   </div>
+  `;
+ }
+
+ const el=document.getElementById("home-history");
+
+ if(!el)return;
+
+ if(!state.history.length){
+
+  el.innerHTML=`
+   <div class="empty">
+    Nenhuma atividade registada.
+   </div>`;
+
+  return;
+ }
+
+ el.innerHTML=
+  state.history.slice(0,4).map(txHTML).join("");
+}
+
+function txHTML(t){
+
+ const income=t.type==="income";
+
+ return `
+
+ <div class="tx">
+
+  <div class="tx-icon"
+       style="background:${income?"#10251e":"#28161a"}">
+
+   <svg width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="${income?"#20d19b":"#ef6672"}"
+        stroke-width="2">
+
+    ${
+     income
+      ?'<path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>'
+      :'<path d="M12 5v14"/><path d="M5 12l7 7 7-7"/>'
+    }
+
+   </svg>
+
+  </div>
+
+  <div class="tx-main">
+
+   <div class="tx-name">
+    ${escapeHTML(t.entity)}
+   </div>
+
+   <div class="tx-date">
+    ${escapeHTML(t.date)}
+   </div>
+
+  </div>
+
+  <div class="tx-amount"
+       style="color:${income?"#20d19b":"#ef6672"}">
+
+   ${income?"+":"−"}
+   ${Number(t.amount).toFixed(2)}
+   ${escapeHTML(t.currency)}
+
+   <div class="tx-conversion">
+    ${income?"+":"−"}${Number(t.usd).toFixed(2)} USD
+   </div>
+
+  </div>
+
+ </div>
+ `;
+}
+
+function addHistory(type,entity,amount,currency="USD"){
+
+ const usd=
+  currency==="USD"
+   ?Number(amount)
+   :Number(amount)/EXCHANGE;
+
+ if(type==="income")
+  state.balance+=usd;
+
+ if(type==="withdrawal")
+  state.balance=Math.max(0,state.balance-usd);
+
+ state.balance=
+  Number(state.balance.toFixed(2));
+
+ state.history.unshift({
+  type,
+  entity,
+  amount:Number(amount),
+  currency,
+  usd,
+  date:nowDate()
+ });
+
+ updateBalance();
+ renderHome();
+ renderHistory();
+ persist();
+}
+
+function renderHistory(){
+
+ const el=document.getElementById("history-list");
+
+ if(!el)return;
+
+ const search=
+  (document.getElementById("history-search")?.value||"")
+  .toLowerCase();
+
+ const arr=state.history.filter(x=>
+  x.entity.toLowerCase().includes(search)
+ );
+
+ if(!arr.length){
+
+  el.innerHTML=`
+   <div class="empty">
+    Nenhuma transação encontrada.
+   </div>`;
+
+  return;
+ }
+
+ el.innerHTML=
+  arr.map(txHTML).join("");
+
+ updateBalance();
+}
+
+function selectMethod(m){
+
+ state.method=m;
+
+ ["mpesa","emola","paypal","bim"].forEach(x=>{
+
+  const btn=document.getElementById("method-"+x);
+  const check=document.getElementById("check-"+x);
+
+  if(btn)
+   btn.classList.toggle("active",x===m);
+
+  if(check)
+   check.textContent=x===m?"✓":"";
+
+ });
+
+ const label=
+  document.getElementById("destination-label");
+
+ const destination=
+  document.getElementById("destination");
+
+ if(label){
+
+  label.textContent=
+   m==="paypal"
+    ?"E-mail ou conta PayPal"
+    :m==="bim"
+      ?"Número de conta"
+      :"Número "+methods[m];
+ }
+
+ if(destination){
+
+  destination.placeholder=
+   m==="paypal"
+    ?"exemplo@email.com"
+    :m==="bim"
+      ?"Número da conta"
+      :"Ex.: 84 000 0000";
+ }
+
+ updateReview();
+}
+
+function selectCard(index){
+
+ if(!state.cards[index])return;
+
+ state.selectedCard=index;
+
+ renderCards();
+ renderWithdrawCardSelection();
+ renderHome();
+
+ showToast(
+  "Cartão selecionado",
+  state.cards[index].name+
+  " foi definido para esta demonstração."
+ );
+}
+
+function renderWithdrawCardSelection(){
+
+ const el=
+  document.getElementById("withdraw-card-selection");
+
+ if(!el)return;
+
+ el.innerHTML=state.cards.map((c,i)=>`
+
+  <button class="method ${i===state.selectedCard?"active":""}"
+          onclick="selectCard(${i})">
+
+   <div class="method-icon"
+        style="background:#111c28">
+
+    <svg viewBox="0 0 24 24"
+         fill="none"
+         stroke="#5b9cff"
+         stroke-width="1.7">
+
+     <rect x="2.5" y="4" width="19" height="16" rx="3"/>
+     <path d="M2.5 9h19"/>
+     <path d="M7 14h4"/>
+     <path d="M7 17h6"/>
+
+    </svg>
+
+   </div>
+
+   <div>
+
+    <b>${escapeHTML(c.type)}</b>
+
+    <span>
+     ${escapeHTML(c.number)} ·
+     ${escapeHTML(c.currency)}
+    </span>
+
+   </div>
+
+   <div class="check">
+    ${i===state.selectedCard?"✓":""}
+   </div>
+
+  </button>
+
+ `).join("");
+}
+
+function renderCards(){
+
+ const el=document.getElementById("cards-list");
+
+ if(!el)return;
+
+ el.innerHTML=state.cards.map((c,i)=>`
+
+  <div class="card-item">
+
+   <div class="card"
+        onclick="selectCard(${i})"
+        style="cursor:pointer">
+
+    <div class="card-top">
+
+     <div class="card-brand">
+      CARDMZ ${escapeHTML(c.type).toUpperCase()}
+     </div>
+
+     <div class="chip"></div>
+
+    </div>
+
+    <div class="card-number">
+     ${escapeHTML(c.number)}
+    </div>
+
+    <div class="card-bottom">
+
+     <div>
+      <div class="card-caption">Titular</div>
+      <div class="card-value">
+       ${escapeHTML(c.name).toUpperCase()}
+      </div>
+     </div>
+
+     <div>
+      <div class="card-caption">Validade</div>
+      <div class="card-value">
+       ${escapeHTML(c.expiry)}
+      </div>
+     </div>
+
+     <div class="card-network">
+      ${escapeHTML(c.currency)}
+     </div>
+
+    </div>
+
+   </div>
+
+   <div class="card-details">
+
+    <div class="card-details-row">
+     <span>Tipo</span>
+     <b>${escapeHTML(c.type)}</b>
+    </div>
+
+    <div class="card-details-row">
+     <span>Moeda</span>
+     <b>${escapeHTML(c.currency)}</b>
+    </div>
+
+    <div class="card-details-row">
+     <span>Limite</span>
+     <b>${escapeHTML(c.limit)} ${escapeHTML(c.currency)}</b>
+    </div>
+
+    <div class="card-details-row">
+     <span>Estado</span>
+     <b style="color:#20d19b">Ativo</b>
+    </div>
+
+    <div class="card-details-row">
+     <span>Utilização</span>
+     <b style="color:${i===state.selectedCard?"#20d19b":"#87919a"}">
+      ${i===state.selectedCard?"Selecionado":"Selecionar"}
+     </b>
+    </div>
+
+   </div>
+
+  </div>
+
+ `).join("");
+
+ const selectedBox=
+  document.getElementById("selected-card-box");
+
+ if(selectedBox){
+
+  const c=state.cards[state.selectedCard];
+
+  selectedBox.innerHTML=`
+
+   <div class="selected-card">
+
+    <div>
+     <b>Cartão utilizado</b>
+     <span>
+      ${escapeHTML(c.name)} · ${escapeHTML(c.number)}
+     </span>
+    </div>
+
+    <button class="select-card-btn">
+     Selecionado
+    </button>
+
+   </div>
+
+  `;
+ }
+}
+
+function setCurrency(c){
+
+ withdrawCurrency=c;
+
+ document.getElementById("cur-usd")
+  .classList.toggle("active",c==="USD");
+
+ document.getElementById("cur-mzn")
+  .classList.toggle("active",c==="MZN");
+
+ updateWithdrawPreview();
+}
+
+function updateWithdrawPreview(){
+
+ const value=
+  Number(document.getElementById("withdraw-amount")?.value||0);
+
+ const usd=
+  withdrawCurrency==="USD"
+   ?value
+   :value/EXCHANGE;
+
+ const equivalent=
+  withdrawCurrency==="USD"
+   ?value*EXCHANGE
+   :value;
+
+ const sumAmount=
+  document.getElementById("sum-amount");
+
+ const sumEquivalent=
+  document.getElementById("sum-equivalent");
+
+ const sumAfter=
+  document.getElementById("sum-after");
+
+ const literal=
+  document.getElementById("withdraw-literal-preview");
+
+ const converted=
+  document.getElementById("withdraw-converted-preview");
+
+ if(sumAmount)
+  sumAmount.textContent=
+   value
+    ?value.toFixed(2)+" "+withdrawCurrency
+    :"$0.00";
+
+ if(sumEquivalent)
+  sumEquivalent.textContent=
+   withdrawCurrency==="USD"
+    ?Math.round(equivalent).toLocaleString()+" MZN"
+    :usd.toFixed(2)+" USD";
+
+ if(sumAfter)
+  sumAfter.textContent=
+   money(Math.max(0,state.balance-usd));
+
+ if(literal)
+  literal.textContent=
+   "Literal: "+
+   value.toFixed(2)+" "+
+   withdrawCurrency;
+
+ if(converted)
+  converted.textContent=
+   withdrawCurrency==="USD"
+    ?"Conversão: "+Math.round(equivalent).toLocaleString()+" MZN"
+    :"Conversão: "+usd.toFixed(2)+" USD";
+
+ const next=
+  document.getElementById("amount-next");
+
+ if(next)
+  next.disabled=
+   !(value>0&&usd<=state.balance);
+}
+
+function withdrawNext(n){
+
+ document.querySelectorAll(".withdraw-step")
+  .forEach(x=>x.classList.remove("active"));
+
+ const step=
+  document.getElementById("w"+n);
+
+ if(step)
+  step.classList.add("active");
+
+ for(let i=1;i<=6;i++){
+
+  const s=document.getElementById("s"+i);
+
+  if(s)
+   s.classList.toggle("active",i<=n);
+
+ }
+
+ if(n===2)
+  renderWithdrawCardSelection();
+
+ if(n===3){
+
+  updateBalance();
+  updateWithdrawPreview();
+
+ }
+
+ if(n===4)
+  updateReview();
+
+ if(n===5)
+  updateReview();
+}
+
+function updateReview(){
+
+ const value=
+  Number(document.getElementById("withdraw-amount")?.value||0);
+
+ const selected=
+  state.cards[state.selectedCard];
+
+ const reviewMethod=
+  document.getElementById("review-method");
+
+ const reviewAmount=
+  document.getElementById("review-amount");
+
+ const reviewDestination=
+  document.getElementById("review-destination");
+
+ const reviewCard=
+  document.getElementById("review-card");
+
+ if(reviewMethod)
+  reviewMethod.textContent=
+   methods[state.method];
+
+ if(reviewAmount)
+  reviewAmount.textContent=
+   value.toFixed(2)+" "+withdrawCurrency;
+
+ if(reviewDestination)
+  reviewDestination.textContent=
+   document.getElementById("destination")?.value
+   ||"Não informado";
+
+ if(reviewCard&&selected)
+  reviewCard.textContent=
+   selected.type+" · "+selected.number;
+}
+
+function handleProof(input){
+
+ if(!input.files||!input.files[0])
+  return;
+
+ proofName=input.files[0].name;
+
+ document.getElementById("proof-name")
+  .textContent=proofName;
+
+ showToast(
+  "Comprovativo selecionado",
+  proofName
+ );
+}
+
+function validateDestination(){
+
+ const destination=
+  document.getElementById("destination")
+   .value.trim();
+
+ const name=
+  document.getElementById("destination-name")
+   .value.trim();
+
+ if(!destination||!name){
+
+  showToast(
+   "Dados incompletos",
+   "Preencha o destino e o nome para continuar."
+  );
+
+  return;
+ }
+
+ updateReview();
+
+ const amount=
+  Number(document.getElementById("withdraw-amount").value||0);
+
+ const usd=
+  withdrawCurrency==="USD"
+   ?amount
+   :amount/EXCHANGE;
+
+ if(amount<=0||usd>state.balance){
+
+  showToast(
+   "Valor inválido",
+   "O valor informado não está disponível nesta demonstração."
+  );
+
+  return;
+ }
+
+ const selected=
+  state.cards[state.selectedCard];
+
+ document.getElementById("confirm-method")
+  .textContent=methods[state.method];
+
+ document.getElementById("confirm-card")
+  .textContent=
+   selected.type+" · "+selected.number;
+
+ document.getElementById("confirm-amount")
+  .textContent=
+   amount.toFixed(2)+" "+withdrawCurrency;
+
+ document.getElementById("confirm-conversion")
+  .textContent=
+   withdrawCurrency==="USD"
+    ?Math.round(amount*EXCHANGE).toLocaleString()+" MZN"
+    :usd.toFixed(2)+" USD";
+
+ document.getElementById("confirm-name")
+  .textContent=name;
+
+ document.getElementById("confirm-destination")
+  .textContent=destination;
+
+ document.getElementById("confirm-proof")
+  .textContent=
+   proofName||"Não anexado";
+
+ withdrawNext(5);
+}
+
+function startWithdrawProcessing(){
+
+ const amount=
+  Number(document.getElementById("withdraw-amount").value||0);
+
+ const usd=
+  withdrawCurrency==="USD"
+   ?amount
+   :amount/EXCHANGE;
+
+ if(amount<=0||usd>state.balance){
+
+  showToast(
+   "Valor inválido",
+   "O valor informado não está disponível para esta demonstração."
+  );
+
+  return;
+ }
+
+ withdrawNext(6);
+
+ const totalSeconds=30;
+
+ let seconds=totalSeconds;
+ let elapsed=0;
+
+ document.getElementById("processing-seconds")
+  .textContent=seconds;
+
+ document.getElementById("progress-bar")
+  .style.width="0%";
+
+ document.getElementById("progress-percent")
+  .textContent="0%";
+
+ document.getElementById("processing-title")
+  .textContent="Preparando operação";
+
+ document.getElementById("processing-text")
+  .textContent=
+   "Validando os dados da demonstração...";
+
+ ["log1","log2","log3","log4","log5"]
+  .forEach(x=>{
+   document.getElementById(x)
+    .classList.remove("ok");
+  });
+
+ const messages=[
+  "Validando os dados da demonstração...",
+  "Conferindo o cartão selecionado...",
+  "Preparando os dados do destino...",
+  "Processando a operação visual...",
+  "Finalizando a demonstração..."
+ ];
+
+ clearInterval(processingTimer);
+
+ processingTimer=setInterval(()=>{
+
+  elapsed++;
+  seconds--;
+
+  const percent=
+   Math.round((elapsed/totalSeconds)*100);
+
+  document.getElementById("processing-seconds")
+   .textContent=Math.max(0,seconds);
+
+  document.getElementById("progress-bar")
+   .style.width=percent+"%";
+
+  document.getElementById("progress-percent")
+   .textContent=percent+"%";
+
+  const stage=
+   Math.min(
+    4,
+    Math.floor(elapsed/(totalSeconds/5))
+   );
+
+  document.getElementById("processing-title")
+   .textContent=
+    stage<4
+     ?"Processando operação"
+     :"Finalizando operação";
+
+  document.getElementById("processing-text")
+   .textContent=messages[stage];
+
+  for(let i=1;i<=stage+1;i++)
+   document.getElementById("log"+i)
+    .classList.add("ok");
+
+  if(elapsed>=totalSeconds){
+
+   clearInterval(processingTimer);
+
+   finishWithdraw(amount,usd);
+  }
+
+ },1000);
+}
+
+function finishWithdraw(amount,usd){
+
+ state.balance=
+  Number(Math.max(0,state.balance-usd).toFixed(2));
+
+ const selected=
+  state.cards[state.selectedCard];
+
+ const destination=
+  document.getElementById("destination").value;
+
+ const name=
+  document.getElementById("destination-name").value;
+
+ const ref=
+  "DEMO-"+
+  Math.random()
+   .toString(36)
+   .substring(2,10)
+   .toUpperCase();
+
+ const date=nowDate();
+
+ state.history.unshift({
+
+  type:"withdrawal",
+  entity:methods[state.method],
+  amount,
+  currency:withdrawCurrency,
+  usd,
+  date
+
+ });
+
+ state.notificationTimeline.unshift({
+
+  title:"Levantamento processado",
+  text:
+   amount.toFixed(2)+" "+
+   withdrawCurrency+
+   " · "+
+   methods[state.method],
+
+  date
+
+ });
+
+ updateBalance();
+ renderHome();
+ renderHistory();
+ renderNotifications();
+ persist();
+
+ document.getElementById("w6").innerHTML=`
+
+ <div class="processing">
+
+  <div class="demo">
+   SIMULAÇÃO — SEM VALOR FINANCEIRO
+  </div>
+
+  <div class="receipt-success">
+
+   <svg viewBox="0 0 24 24"
+        fill="none"
+        stroke="#20d19b"
+        stroke-width="2.2">
+    <path d="M20 6L9 17l-5-5"/>
+   </svg>
+
+  </div>
+
+  <h2 style="margin:0;font-size:20px;font-weight:900">
+   Operação concluída
+  </h2>
+
+  <p>
+   O fluxo visual da demonstração foi concluído.
+  </p>
+
+  <div class="receipt"
+       style="text-align:left;margin-top:18px">
+
+   <div class="demo">
+    COMPROVATIVO DE DEMONSTRAÇÃO
+   </div>
+
+   <div class="receipt-title">
+    Levantamento confirmado
+   </div>
+
+   <div class="receipt-sub">
+    Este comprovativo pertence apenas à demonstração local.
+   </div>
+
+   <div class="receipt-id">
+    ${ref}
+   </div>
+
+   <div class="receipt-row">
+    <span>Método</span>
+    <b>${escapeHTML(methods[state.method])}</b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Cartão</span>
+    <b>${escapeHTML(selected.number)}</b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Valor</span>
+    <b>${amount.toFixed(2)} ${escapeHTML(withdrawCurrency)}</b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Conversão</span>
+    <b>
+     ${withdrawCurrency==="USD"
+      ?Math.round(amount*EXCHANGE).toLocaleString()+" MZN"
+      :usd.toFixed(2)+" USD"}
+    </b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Destinatário</span>
+    <b>${escapeHTML(name)}</b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Destino</span>
+    <b>${escapeHTML(destination)}</b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Comprovativo</span>
+    <b>${escapeHTML(proofName||"Não anexado")}</b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Data</span>
+    <b>${escapeHTML(date)}</b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Processamento</span>
+    <b>30 segundos</b>
+   </div>
+
+   <div class="receipt-row">
+    <span>Taxa demonstrativa</span>
+    <b>$0.00</b>
+   </div>
+
+   <div class="receipt-status">
+    Fluxo local concluído. Nenhum pagamento ou transferência bancária foi efetuado.
+   </div>
+
+  </div>
+
+  <button class="primary"
+          onclick="resetWithdraw()">
+   Voltar ao início
+  </button>
+
+  <button class="secondary"
+          onclick="goToPage('history')">
+   Ver histórico
+  </button>
+
+ </div>
+ `;
+
+ showToast(
+  "Levantamento confirmado",
+  amount.toFixed(2)+" "+
+  withdrawCurrency+
+  " · "+
+  methods[state.method]
+ );
+}
+
+function resetWithdraw(){
+
+ clearInterval(processingTimer);
+
+ proofName="";
+
+ document.getElementById("w6").innerHTML=`
+
+ <div class="processing">
+
+  <div class="demo">
+   PROCESSAMENTO DE DEMONSTRAÇÃO
+  </div>
+
+  <div class="processing-icon">
+
+   <svg width="35"
+        height="35"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#20d19b"
+        stroke-width="1.5">
+
+    <path d="M12 6v6l4 2"/>
+    <circle cx="12" cy="12" r="8"/>
+
+   </svg>
+
+  </div>
+
+  <h2 id="processing-title">
+   Preparando operação
+  </h2>
+
+  <p id="processing-text">
+   A demonstração está a preparar o próximo estágio.
+  </p>
+
+  <div id="processing-seconds"
+       class="processing-number">
+   30
+  </div>
+
+  <div class="processing-unit">
+   SEGUNDOS
+  </div>
+
+  <div class="progress">
+   <div id="progress-bar"
+        class="progress-bar">
+   </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;font-size:8px;color:#69747d">
+   <span>Início</span>
+   <span id="progress-percent">0%</span>
+   <span>Final</span>
+  </div>
+
+  <div class="processing-log">
+
+   <div id="log1" class="log">
+    <i class="log-dot"></i>
+    Validando dados da demonstração
+   </div>
+
+   <div id="log2" class="log">
+    <i class="log-dot"></i>
+    Conferindo cartão selecionado
+   </div>
+
+   <div id="log3" class="log">
+    <i class="log-dot"></i>
+    Preparando dados do destino
+   </div>
+
+   <div id="log4" class="log">
+    <i class="log-dot"></i>
+    Processando operação visual
+   </div>
+
+   <div id="log5" class="log">
+    <i class="log-dot"></i>
+    Finalizando demonstração
+   </div>
+
+  </div>
+
+ </div>
+ `;
+
+ document.getElementById("proof-name")
+  ?.textContent="Nenhum comprovativo anexado";
+
+ withdrawNext(1);
+}
+
+function openDeposit(){
+ document.getElementById("deposit-modal")
+  .classList.add("show");
+}
+
+function setDepButtons(){
+
+ document.getElementById("dep-usd")
+  .classList.toggle("active",depCurrency==="USD");
+
+ document.getElementById("dep-mzn")
+  .classList.toggle("active",depCurrency==="MZN");
+}
+
+document.getElementById("dep-amount")
+ ?.addEventListener("input",()=>{
+
+  const value=
+   Number(document.getElementById("dep-amount").value||0);
+
+  const preview=
+   document.getElementById("dep-preview");
+
+  if(preview)
+   preview.style.display=value>0?"block":"none";
+
+  const literal=
+   document.getElementById("dep-literal");
+
+  const converted=
+   document.getElementById("dep-converted");
+
+  if(literal)
+   literal.textContent=
+    "Literal: "+
+    value.toFixed(2)+" "+
+    depCurrency;
+
+  if(converted)
+   converted.textContent=
+    depCurrency==="USD"
+     ?"Conversão: "+Math.round(value*EXCHANGE).toLocaleString()+" MZN"
+     :"Conversão: "+(value/EXCHANGE).toFixed(2)+" USD";
+ });
+
+function deposit(){
+
+ const amount=
+  Number(document.getElementById("dep-amount").value||0);
+
+ const origin=
+  document.getElementById("dep-origin").value;
+
+ if(amount<=0||!origin){
+
+  showToast(
+   "Dados incompletos",
+   "Preencha o valor e a origem."
+  );
+
+  return;
+ }
+
+ addHistory(
+  "income",
+  origin,
+  amount,
+  depCurrency
+ );
+
+ closeOverlay("deposit-modal");
+
+ document.getElementById("dep-amount").value="";
+ document.getElementById("dep-origin").value="";
+
+ showToast(
+  "Valor recebido",
+  "+"+
+  amount.toFixed(2)+" "+
+  depCurrency+
+  " · "+
+  origin
+ );
+}
+
+function openCardModal(){
+
+ document.getElementById("card-modal")
+  .classList.add("show");
+}
+
+function addCard(){
+
+ const name=
+  document.getElementById("new-card-name")
+   .value.trim();
+
+ const type=
+  document.getElementById("new-card-type").value;
+
+ const currency=
+  document.getElementById("new-card-currency").value;
+
+ const limit=
+  document.getElementById("new-card-limit").value||"1000";
+
+ const expiry=
+  document.getElementById("new-card-expiry").value||"12/30";
+
+ if(!name){
+
+  showToast(
+   "Nome necessário",
+   "Informe o nome do titular."
+  );
+
+  return;
+ }
+
+ const last=
+  Math.floor(1000+Math.random()*8999);
+
+ const card={
+  id:Date.now(),
+  name,
+  type,
+  currency,
+  limit,
+  expiry,
+  number:"4323 •••• •••• "+last
+ };
+
+ state.cards.push(card);
+
+ state.selectedCard=
+  state.cards.length-1;
+
+ renderCards();
+ renderWithdrawCardSelection();
+ renderHome();
+
+ closeOverlay("card-modal");
+
+ document.getElementById("new-card-name").value="";
+ document.getElementById("new-card-limit").value="";
+ document.getElementById("new-card-expiry").value="";
+
+ showToast(
+  "Cartão criado",
+  name+" foi criado e selecionado."
+ );
+
+ persist();
+}
+
+function openNotification(){
+
+ document.getElementById("notif-modal")
+  .classList.add("show");
+}
+
+document.getElementById("notif-amount")
+ ?.addEventListener("input",()=>{
+
+  const amount=
+   Number(document.getElementById("notif-amount").value||0);
+
+  document.getElementById("notif-literal")
+   .textContent=
+    "Literal: "+
+    amount.toFixed(2)+" USD";
+
+  document.getElementById("notif-converted")
+   .textContent=
+    "Conversão: "+
+    Math.round(amount*EXCHANGE).toLocaleString()+
+    " MZN";
+ });
+
+function createNotification(){
+
+ const type=
+  document.getElementById("notif-type").value;
+
+ const origin=
+  document.getElementById("notif-origin")
+   .value.trim();
+
+ const amount=
+  Number(document.getElementById("notif-amount").value||0);
+
+ const delay=
+  Number(document.getElementById("notif-delay").value||3);
+
+ if(!origin||amount<=0){
+
+  showToast(
+   "Dados incompletos",
+   "Preencha o nome e o valor da notificação."
+  );
+
+  return;
+ }
+
+ const n={
+
+  id:Date.now(),
+
+  type,
+
+  origin,
+
+  amount,
+
+  createdAt:Date.now(),
+
+  at:Date.now()+delay*1000,
+
+  delivered:false
+
+ };
+
+ state.notifications.push(n);
+
+ state.notificationTimeline.unshift({
+
+  title:"Notificação agendada",
+
+  text:
+   origin+
+   " · "+
+   amount.toFixed(2)+
+   " USD",
+
+  date:nowDate()
+
+ });
+
+ scheduleNotification(n);
+
+ closeOverlay("notif-modal");
+
+ document.getElementById("notif-origin").value="";
+ document.getElementById("notif-amount").value="";
+
+ renderNotifications();
+ updateBadge();
+ persist();
+
+ showToast(
+  "Notificação agendada",
+  "Ela aparecerá após "+formatDelay(delay)+"."
+ );
+}
+
+function formatDelay(seconds){
+
+ if(seconds<60)
+  return seconds+
+   " segundo"+
+   (seconds===1?"":"s");
+
+ const minutes=Math.floor(seconds/60);
+
+ return minutes+
+  " minuto"+
+  (minutes===1?"":"s");
+}
+
+function scheduleNotification(n){
+
+ const remaining=
+  Math.max(0,n.at-Date.now());
+
+ state.notificationTimers[n.id]=
+  setTimeout(()=>{
+   deliverNotification(n.id);
+  },remaining);
+}
+
+function deliverNotification(id){
+
+ const index=
+  state.notifications.findIndex(x=>x.id===id);
+
+ if(index===-1)return;
+
+ const n=
+  state.notifications[index];
+
+ state.notifications.splice(index,1);
+
+ n.delivered=true;
+ n.deliveredAt=Date.now();
+
+ state.deliveredNotifications.unshift(n);
+
+ delete state.notificationTimers[id];
+
+ addHistory(
+  n.type,
+  n.origin,
+  n.amount,
+  "USD"
+ );
+
+ state.notificationTimeline.unshift({
+
+  title:
+   n.type==="income"
+    ?"Recebimento confirmado"
+    :"Operação confirmada",
+
+  text:
+   n.origin+
+   " · "+
+   n.amount.toFixed(2)+
+   " USD",
+
+  date:nowDate()
+
+ });
+
+ updateBadge();
+ renderNotifications();
+ showConfirmationNotification(n);
+ persist();
+}
+
+function showConfirmationNotification(n){
+
+ const title=
+  n.type==="income"
+   ?"Recebimento confirmado"
+   :"Operação confirmada";
+
+ const amount=
+  (n.type==="income"?"+":"−")+
+  n.amount.toFixed(2)+" USD";
+
+ document.getElementById("toast-title")
+  .textContent=title;
+
+ document.getElementById("toast-message")
+  .textContent=
+   n.origin+" · "+amount;
+
+ document.getElementById("toast-time")
+  .textContent="agora";
+
+ const banner=
+  document.getElementById("notification-banner");
+
+ if(banner){
+
+  banner.style.display="flex";
+
+  document.getElementById("banner-title")
+   .textContent=title;
+
+  document.getElementById("banner-text")
+   .textContent=
+    n.origin+" · "+amount;
+ }
+
+ const t=document.getElementById("toast");
+
+ t.classList.add("show");
+
+ clearTimeout(window.toastTimeout);
+
+ window.toastTimeout=
+  setTimeout(()=>hideToast(),7000);
+}
+
+function hideToast(){
+
+ const t=
+  document.getElementById("toast");
+
+ if(t)
+  t.classList.remove("show");
+}
+
+function removeNotification(id){
+
+ if(state.notificationTimers[id]){
+
+  clearTimeout(
+   state.notificationTimers[id]
+  );
+
+  delete state.notificationTimers[id];
+ }
+
+ state.notifications=
+  state.notifications.filter(
+   x=>x.id!==id
+  );
+
+ renderNotifications();
+ updateBadge();
+ persist();
+}
+
+function renderNotifications(){
+
+ const el=
+  document.getElementById("notification-list");
+
+ if(!el)return;
+
+ let html="";
+
+ if(state.notifications.length){
+
+  html+=state.notifications.map(n=>`
+
+   <div class="notification-item">
+
+    <div class="notification-icon"
+         style="background:${n.type==="income"?"#10251e":"#28161a"}">
+
+     <svg width="19"
+          height="19"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="${n.type==="income"?"#20d19b":"#ef6672"}"
+          stroke-width="2">
+
+      ${
+       n.type==="income"
+        ?'<path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>'
+        :'<path d="M12 5v14"/><path d="M5 12l7 7 7-7"/>'
+      }
+
+     </svg>
+
+    </div>
+
+    <div class="notification-main">
+
+     <b>
+      ${n.type==="income"
+       ?"Recebimento pendente"
+       :"Operação pendente"}
+     </b>
+
+     <span>
+      ${escapeHTML(n.origin)}
+      · aparece em ${formatRemaining(n.at)}
+     </span>
+
+    </div>
+
+    <div class="notification-amount">
+
+     ${n.amount.toFixed(2)} USD
+
+     <small>
+      ${Math.round(n.amount*EXCHANGE).toLocaleString()} MZN
+     </small>
+
+    </div>
+
+    <button class="notification-remove"
+            onclick="removeNotification(${n.id})">
+     ×
+    </button>
+
+   </div>
+
+  `).join("");
+ }
+
+ if(state.deliveredNotifications.length){
+
+  html+=state.deliveredNotifications
+   .slice(0,10)
+   .map(n=>`
+
+    <div class="notification-item">
+
+     <div class="notification-icon"
+          style="background:#10251e">
+
+      <svg width="19"
+           height="19"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="#20d19b"
+           stroke-width="2">
+
+       <path d="M20 6L9 17l-5-5"/>
+
+      </svg>
+
+     </div>
+
+     <div class="notification-main">
+
+      <b>Confirmado</b>
+
+      <span>
+       ${escapeHTML(n.origin)}
+       · ${new Date(n.deliveredAt).toLocaleString("pt-PT")}
+      </span>
+
+     </div>
+
+     <div class="notification-amount">
+
+      ${n.amount.toFixed(2)} USD
+
+      <small>
+       ${Math.round(n.amount*EXCHANGE).toLocaleString()} MZN
+      </small>
+
+     </div>
+
+    </div>
+
+   `).join("");
+ }
+
+ if(!html){
+
+  html=`
+   <div class="empty">
+    Nenhuma notificação registada.
+   </div>
+  `;
+ }
+
+ el.innerHTML=html;
+
+ renderNotificationTimeline();
+}
+
+function renderNotificationTimeline(){
+
+ const el=
+  document.getElementById("notification-timeline");
+
+ if(!el)return;
+
+ if(!state.notificationTimeline.length){
+
+  el.innerHTML=`
+   <div class="empty">
+    Nenhuma atividade de notificação.
+   </div>
+  `;
+
+  return;
+ }
+
+ el.innerHTML=
+  state.notificationTimeline
+   .slice(0,12)
+   .map(x=>`
+
+    <div class="timeline-item">
+
+     <div class="timeline-dot"></div>
+
+     <div class="timeline-card">
+
+      <b>${escapeHTML(x.title)}</b>
+
+      <span>
+       ${escapeHTML(x.text)}
+       <br>
+       ${escapeHTML(x.date)}
+      </span>
+
+     </div>
+
+    </div>
+
+   `)
+   .join("");
+}
+
+function formatRemaining(timestamp){
+
+ const seconds=
+  Math.max(
+   0,
+   Math.ceil(
+    (timestamp-Date.now())/1000
+   )
+  );
+
+ if(seconds<60)
+  return seconds+"s";
+
+ return Math.ceil(seconds/60)+"min";
+}
+
+function updateBadge(){
+
+ const count=
+  state.notifications.length;
+
+ const badge=
+  document.getElementById("nav-badge");
+
+ if(badge){
+
+  badge.textContent=count;
+
+  badge.style.display=
+   count?"flex":"none";
+ }
+
+ const pc=
+  document.getElementById("pending-count");
+
+ const dc=
+  document.getElementById("delivered-count");
+
+ if(pc)
+  pc.textContent=count;
+
+ if(dc)
+  dc.textContent=
+   state.deliveredNotifications.length;
+}
+
+function showToast(title,message){
+
+ if(message===undefined){
+
+  message=title;
+  title="Atualizado";
+ }
+
+ document.getElementById("toast-title")
+  .textContent=title;
+
+ document.getElementById("toast-message")
+  .textContent=message;
+
+ document.getElementById("toast-time")
+  .textContent="agora";
+
+ const t=
+  document.getElementById("toast");
+
+ t.classList.add("show");
+
+ clearTimeout(window.toastTimeout);
+
+ window.toastTimeout=
+  setTimeout(()=>hideToast(),4000);
+}
+
+function closeOverlay(id){
+
+ const el=
+  document.getElementById(id);
+
+ if(el)
+  el.classList.remove("show");
+}
+
+document.querySelectorAll(".overlay")
+ .forEach(o=>{
+
+  o.addEventListener("click",e=>{
+
+   if(e.target===o)
+    o.classList.remove("show");
+
+  });
+
+ });
+
+const STORAGE_KEY=
+ "cardmz_demo_state_v5";
+
+function saveState(){
+
+ try{
+
+  localStorage.setItem(
+   STORAGE_KEY,
+   JSON.stringify({
+
+    balance:state.balance,
+    currency:state.currency,
+    method:state.method,
+    selectedCard:state.selectedCard,
+
+    cards:state.cards,
+
+    history:state.history,
+
+    notifications:state.notifications,
+
+    deliveredNotifications:
+     state.deliveredNotifications,
+
+    notificationTimeline:
+     state.notificationTimeline
+
+   })
+  );
+
+ }catch(e){}
+}
+
+function loadState(){
+
+ try{
+
+  const raw=
+   localStorage.getItem(STORAGE_KEY);
+
+  if(!raw)return;
+
+  const saved=
+   JSON.parse(raw);
+
+  if(typeof saved.balance==="number")
+   state.balance=saved.balance;
+
+  if(Array.isArray(saved.cards)&&saved.cards.length)
+   state.cards=saved.cards;
+
+  if(Array.isArray(saved.history))
+   state.history=saved.history;
+
+  if(Array.isArray(saved.notifications))
+   state.notifications=saved.notifications;
+
+  if(Array.isArray(saved.deliveredNotifications))
+   state.deliveredNotifications=
+    saved.deliveredNotifications;
+
+  if(Array.isArray(saved.notificationTimeline))
+   state.notificationTimeline=
+    saved.notificationTimeline;
+
+  if(Number.isInteger(saved.selectedCard))
+   state.selectedCard=
+    Math.min(
+     saved.selectedCard,
+     state.cards.length-1
+    );
+
+  if(saved.method)
+   state.method=saved.method;
+
+ }catch(e){}
+}
+
+function persist(){
+ saveState();
+}
+
+function recoverNotifications(){
+
+ const now=Date.now();
+
+ state.notifications.forEach(n=>{
+
+  if(n.at<=now){
+
+   setTimeout(()=>{
+    deliverNotification(n.id);
+   },250);
+
+  }else{
+
+   scheduleNotification(n);
+
+  }
+
+ });
+
+ updateBadge();
+}
+
+loadState();
+
+if(state.selectedCard>=state.cards.length)
+ state.selectedCard=0;
+
+updateBalance();
+renderHome();
+renderCards();
+renderWithdrawCardSelection();
+renderHistory();
+renderNotifications();
+updateBadge();
+recoverNotifications();
+
+setInterval(()=>{
+
+ if(state.notifications.length){
+
+  renderNotifications();
+  updateBadge();
+
+ }
+
+ persist();
+
+},1000);
+
+document.addEventListener(
+ "visibilitychange",
+ ()=>{
+
+  if(!document.hidden){
+
+   recoverNotifications();
+   renderNotifications();
+   updateBadge();
+   renderHome();
+   updateBalance();
+
+  }
+
+ }
+);
+
+window.addEventListener(
+ "beforeunload",
+ ()=>{
+  persist();
+ }
+);
+</script>
+
+</body>
+  </html>
